@@ -124,7 +124,11 @@ MonoBehaviour:
   currentStamina: 0
   staminaReduceSpeed: 10
   staminaRecoverySpeed: 20
-  spawnPoint: {fileID: 0}
+  handMaxDistance: 1
+  spawnPoint: {x: 0, y: 0, z: 0}
+  spawnRotation: {x: 0, y: 0, z: 0, w: 0}
+  handsLocalSpawnPosition: {x: 0, y: 0, z: 0}
+  handsLocalSpawnRotation: {x: 0, y: 0, z: 0, w: 0}
 --- !u!54 &8886252700133780572
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -208,6 +212,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 82b1453090079c8478c4f232e25fc2e2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  ledgeOffset: 2
+  ledgeCheckDistance: 3
 --- !u!114 &2108549959242884040
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -244,6 +250,7 @@ GameObject:
   - component: {fileID: 6187638156240207449}
   - component: {fileID: 7469933450700756343}
   - component: {fileID: 3265886248583734748}
+  - component: {fileID: 7415905025591533431}
   m_Layer: 0
   m_Name: Hands
   m_TagString: Untagged
@@ -316,6 +323,24 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5374442801556485777}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1818360609 &7415905025591533431
+RotationConstraint:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5374442801556485777}
+  m_Enabled: 0
+  serializedVersion: 2
+  m_Weight: 1
+  m_RotationAtRest: {x: 0, y: 0, z: 0}
+  m_RotationOffset: {x: 0, y: 0, z: 0}
+  m_AffectRotationX: 1
+  m_AffectRotationY: 1
+  m_AffectRotationZ: 1
+  m_Active: 1
+  m_IsLocked: 1
+  m_Sources: []
 --- !u!1 &5648672224902614892
 GameObject:
   m_ObjectHideFlags: 0

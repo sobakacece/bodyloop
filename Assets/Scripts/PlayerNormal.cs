@@ -18,7 +18,7 @@ public class PlayerNormal : PlayerState
             player.Move();
         }
 
-        if (player.CouldGrabSurface() && Input.GetMouseButton(0))
+        if (player.CouldStartClimb() && Input.GetMouseButton(0))
         {
             stateMachine.ChangeState(PlayerStateMachine.StateEnum.Climb);
         }
