@@ -102,7 +102,7 @@ public class PlayerController : MonoBehaviour
     }
     private void Restart()
     {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        GameFlow.Instance.GameRestart();
     }
 
     public void Move()
