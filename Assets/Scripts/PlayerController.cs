@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using Unity.VisualScripting;
+using UnityEditor.UI;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.SceneManagement;
@@ -15,13 +16,15 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float jumpHeight;
     [SerializeField] private float grabDistance;
 
-    [SerializeField] private Transform headCamera;
+    [SerializeField] public Transform headCamera;
     [SerializeField] private Transform cameraHolder;
     [SerializeField] private Rigidbody rb;
     //   [SerializeField] private SimpleGroundChecker groundChecker;
     [SerializeField] private Collider mainCollider;
 
     private PlayerStateMachine stateMachine;
+
+    [SerializeField] private LayerMask climbCollisions;
     [SerializeField] private GameObject hands;
 
 
@@ -42,6 +45,15 @@ public class PlayerController : MonoBehaviour
     [SerializeField] public float staminaReduceSpeed = 10.0f;
     [SerializeField] public float staminaRecoverySpeed = 20.0f;
 
+    public Vector3 spawnPoint;
+    public Quaternion spawnRotation;
+
+    void Awake()
+    {
+        spawnPoint = transform.position;
+        spawnRotation = transform.rotation;
+        Debug.Log(spawnPoint);
+    }
     private void Start()
     {
         currentStamina = maxStamina;
@@ -59,7 +71,7 @@ public class PlayerController : MonoBehaviour
 
     public bool CouldGrabSurface()
     {
-        return Physics.Raycast(headCamera.position, headCamera.forward, grabDistance);
+        return Physics.Raycast(headCamera.position, headCamera.forward, grabDistance, climbCollisions);
     }
 
     private void Update()
@@ -151,7 +163,7 @@ public class PlayerController : MonoBehaviour
     public void TryGrabCliff()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out RaycastHit hit, grabDistance, Physics.AllLayers))
+        if (Physics.Raycast(ray, out RaycastHit hit, grabDistance, climbCollisions))
         {
             if (cliffCoroutine != null)
                 StopCoroutine(cliffCoroutine);
@@ -193,6 +205,7 @@ public void Climb()
 
         Vector2 input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
         Vector3 move = (hands.transform.right * input.x + hands.transform.up * input.y) * climbingSpeed;
+        rb.velocity = Vector3.zero;
         rb.AddForce(move, ForceMode.VelocityChange);
 }
 
@@ -200,7 +213,7 @@ public void Climb()
 
     private void FixHandsRotation()
     {
-        if (Physics.Raycast(hands.transform.position, hands.transform.forward, out RaycastHit hit, grabDistance, Physics.AllLayers))
+        if (Physics.Raycast(hands.transform.position, hands.transform.forward, out RaycastHit hit, grabDistance, climbCollisions))
             hands.transform.rotation = Quaternion.LookRotation(-hit.normal, Vector3.up);
     }
 

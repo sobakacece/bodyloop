@@ -18,7 +18,7 @@ GameObject:
   - component: {fileID: 6500549939601347387}
   - component: {fileID: 2108549959242884040}
   - component: {fileID: 5053170558713040730}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -113,10 +113,18 @@ MonoBehaviour:
   cameraHolder: {fileID: 2387856492467596027}
   rb: {fileID: 8886252700133780572}
   mainCollider: {fileID: 7563663074827542477}
+  climbCollisions:
+    serializedVersion: 2
+    m_Bits: 8
   hands: {fileID: 5374442801556485777}
   mouseScale: 1
   magnetSpeed: 5
   climbingSpeed: 7
+  maxStamina: 100
+  currentStamina: 0
+  staminaReduceSpeed: 10
+  staminaRecoverySpeed: 20
+  spawnPoint: {fileID: 0}
 --- !u!54 &8886252700133780572
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -212,6 +220,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a5ffa4f5eaa12d42a6062d19185df34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerPrefab: {fileID: 857907827663657364}
 --- !u!114 &5053170558713040730
 MonoBehaviour:
   m_ObjectHideFlags: 0

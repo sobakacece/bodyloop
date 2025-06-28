@@ -19,8 +19,6 @@ public class PlayerClimb : PlayerState
     {
         player.currentStamina -= player.currentStamina * Time.deltaTime * player.staminaReduceSpeed;
         player.currentStamina = Math.Clamp(player.currentStamina, 0, player.maxStamina);
-        Debug.Log(player.currentStamina);
-        rb.velocity = Vector3.zero;
 
 
         player.Climb();

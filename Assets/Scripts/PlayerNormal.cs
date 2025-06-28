@@ -13,7 +13,6 @@ public class PlayerNormal : PlayerState
     {
         player.currentStamina += player.currentStamina * Time.deltaTime * player.staminaRecoverySpeed;
         player.currentStamina = Math.Clamp(player.currentStamina, 0.0f, player.maxStamina);
-        Debug.Log(player.currentStamina);
         if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
         {
             player.Move();

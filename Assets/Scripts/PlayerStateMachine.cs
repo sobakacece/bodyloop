@@ -36,7 +36,12 @@ public class PlayerStateMachine : MonoBehaviour
             relation.action.player = player;
         }
         FindAction(currentState).enabled = true;
-}
+    }
+
+    void Update()
+    {
+        // Debug.Log(currentState);
+    }
     public void ChangeState(StateEnum nextState)
     {
         if (FindAction(nextState) != null && nextState != currentState)
@@ -60,6 +65,15 @@ public class PlayerStateMachine : MonoBehaviour
             }
         }
         return null;
+    }
+
+    public void ResetStates()
+    {
+        foreach (PlayerScriptRelation relation in actions)
+        {
+            relation.action.enabled = false;
+            FindAction(currentState).enabled = true;
+        }
     }
 }
 
