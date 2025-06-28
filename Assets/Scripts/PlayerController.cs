@@ -1,7 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Animations;
 using UnityEngine.SceneManagement;
 
 public class PlayerController : MonoBehaviour
@@ -15,10 +18,11 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private Transform headCamera;
     [SerializeField] private Transform cameraHolder;
     [SerializeField] private Rigidbody rb;
- //   [SerializeField] private SimpleGroundChecker groundChecker;
+    //   [SerializeField] private SimpleGroundChecker groundChecker;
     [SerializeField] private Collider mainCollider;
 
-    [SerializeField] private float normalFootDelay, boostFootDelay;
+    private PlayerStateMachine stateMachine;
+    [SerializeField] private GameObject hands;
 
 
     private Camera viewCamera;
@@ -28,48 +32,32 @@ public class PlayerController : MonoBehaviour
     public float BaseSpeed => baseSpeed;
     public float CurrentSpeed => speed;
 
-    private Vector3 cashedMousePosition;
+    private Coroutine cliffCoroutine;
 
+    [SerializeField] private float magnetSpeed = 5.0f;
+
+    [SerializeField] private float climbingSpeed = 10.0f;
+    [SerializeField] public float maxStamina = 100.0f;
+    [SerializeField] public float currentStamina;
+    [SerializeField] public float staminaReduceSpeed = 10.0f;
+    [SerializeField] public float staminaRecoverySpeed = 20.0f;
 
     private void Start()
     {
-
+        currentStamina = maxStamina;
         speed = baseSpeed;
         viewCamera = headCamera.GetComponent<Camera>();
-
-        _currentFootTimer = normalFootDelay;
-        _currentDelay = _currentFootTimer;
-
+        stateMachine = GetComponent<PlayerStateMachine>();
 
     }
 
-    private float _currentFootTimer;
-    private float _currentDelay;
-    private void FixedUpdate()
+
+    public bool IsGrounded()
     {
-        if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
-        {
-            Move();
-
-            if (IsGrounded())
-            {
-                _currentDelay -= UnityEngine.Time.fixedDeltaTime;
-            }
-
-            if (_currentDelay <= 0)
-            {
-                _currentDelay = _currentFootTimer;
-            }
-        }
+        return Physics.Raycast(transform.position, -Vector3.up, mainCollider.bounds.size.y);
     }
 
-    bool IsGrounded()
-    {
-
-        return Physics.Raycast(transform.position, -Vector3.up, mainCollider.bounds.size.y / 2);
-    }
-
-    bool CouldGrabSurface()
+    public bool CouldGrabSurface()
     {
         return Physics.Raycast(headCamera.position, headCamera.forward, grabDistance);
     }
@@ -89,8 +77,6 @@ public class PlayerController : MonoBehaviour
         //Debug.Log(CouldGrabSurface());
     }
 
-
-
     public void SetCurrentSpeed(float newValue)
     {
         speed = newValue;
@@ -104,36 +90,36 @@ public class PlayerController : MonoBehaviour
     }
     private void Restart()
     {
-            SceneManager.LoadScene(SceneManager.GetActiveScene().name);
+        SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
-private void Move()
-{
-    Vector2 input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
-    if (input == Vector2.zero) return;
-
-    Vector3 delta = (cameraHolder.forward * input.y + cameraHolder.right * input.x).normalized * speed * Time.deltaTime;
-
-    Vector3 rayOrigin = transform.position;
-    Vector3 rayDirection = delta.normalized;
-    float rayLength = delta.magnitude + mainCollider.bounds.extents.x;
-
-    Debug.DrawRay(rayOrigin, rayDirection * rayLength, Color.red);
-
-    if (Physics.Raycast(rayOrigin, rayDirection, out RaycastHit hit, rayLength, Physics.AllLayers, QueryTriggerInteraction.Ignore))
+    public void Move()
     {
-        Vector3 surfaceForward = Vector3.Cross(hit.normal, Vector3.up).normalized;
-        if (Vector3.Dot(surfaceForward, rayDirection) < 0)
-            surfaceForward = -surfaceForward;
+        Vector2 input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+        if (input == Vector2.zero) return;
 
-        float angle = Vector3.Angle(rayDirection, hit.normal);
-        float frictionImitaion = Mathf.InverseLerp(160f, 120f, angle);
+        Vector3 delta = (cameraHolder.forward * input.y + cameraHolder.right * input.x).normalized * speed * Time.deltaTime;
 
-        delta = surfaceForward * delta.magnitude * frictionImitaion;
+        Vector3 rayOrigin = transform.position;
+        Vector3 rayDirection = delta.normalized;
+        float rayLength = delta.magnitude + mainCollider.bounds.extents.x;
+
+        Debug.DrawRay(rayOrigin, rayDirection * rayLength, Color.red);
+
+        if (Physics.Raycast(rayOrigin, rayDirection, out RaycastHit hit, rayLength, Physics.AllLayers, QueryTriggerInteraction.Ignore))
+        {
+            Vector3 surfaceForward = Vector3.Cross(hit.normal, Vector3.up).normalized;
+            if (Vector3.Dot(surfaceForward, rayDirection) < 0)
+                surfaceForward = -surfaceForward;
+
+            float angle = Vector3.Angle(rayDirection, hit.normal);
+            float frictionImitaion = Mathf.InverseLerp(160f, 120f, angle);
+
+            delta = surfaceForward * delta.magnitude * frictionImitaion;
+        }
+
+        rb.MovePosition(transform.position + new Vector3(delta.x, 0f, delta.z));
     }
-
-    rb.MovePosition(transform.position + new Vector3(delta.x, 0f, delta.z));
-}
 
 
     private void Look()
@@ -152,13 +138,70 @@ private void Move()
 
     private void Jump(float height)
     {
+        stateMachine.ChangeState(PlayerStateMachine.StateEnum.Normal);
         rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
         rb.AddForce(Vector3.up * height, ForceMode.Impulse);
     }
 
     private void OnGUI()
     {
-
-        //GUI.Label(new Rect(10, 10, 120, 60), $"Remaining time: {timer.CurrentLifeTime}");
+        GUI.Label(new Rect(30, 30, 360, 180), $"CurrentState: {stateMachine.currentState}");
     }
+
+    public void TryGrabCliff()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out RaycastHit hit, grabDistance, Physics.AllLayers))
+        {
+            if (cliffCoroutine != null)
+                StopCoroutine(cliffCoroutine);
+
+            cliffCoroutine = StartCoroutine(MoveToCliff(hit.point));
+        }
+    }
+
+    private IEnumerator MoveToCliff(Vector3 targetPoint)
+    {
+        while (true)
+        {
+            Vector3 direction = (targetPoint - transform.position).normalized;
+            float distanceToTarget = Vector3.Distance(transform.position, targetPoint);
+            float step = magnetSpeed * Time.deltaTime;
+
+            if (distanceToTarget <= mainCollider.bounds.size.x / 2)
+                break;
+
+            if (Physics.Raycast(transform.position, direction, step + 0.1f, Physics.AllLayers))
+                break;
+
+            transform.position += direction * Mathf.Min(step, distanceToTarget);
+            yield return null;
+        }
+    }
+
+    public void StopCliffMove()
+    {
+        if (cliffCoroutine != null)
+        {
+            StopCoroutine(cliffCoroutine);
+        }
+    }
+
+public void Climb()
+{
+        FixHandsRotation();
+
+        Vector2 input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+        Vector3 move = (hands.transform.right * input.x + hands.transform.up * input.y) * climbingSpeed;
+        rb.AddForce(move, ForceMode.VelocityChange);
+}
+
+
+
+    private void FixHandsRotation()
+    {
+        if (Physics.Raycast(hands.transform.position, hands.transform.forward, out RaycastHit hit, grabDistance, Physics.AllLayers))
+            hands.transform.rotation = Quaternion.LookRotation(-hit.normal, Vector3.up);
+    }
+
 }
