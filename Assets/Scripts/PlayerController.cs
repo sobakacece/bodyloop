@@ -22,7 +22,7 @@ public class PlayerController : MonoBehaviour
     //   [SerializeField] private SimpleGroundChecker groundChecker;
     [SerializeField] private Collider mainCollider;
 
-    private PlayerStateMachine stateMachine;
+    public PlayerStateMachine stateMachine;
 
     [SerializeField] public LayerMask climbCollisions;
     [SerializeField] public GameObject hands;
@@ -41,20 +41,40 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private float climbingSpeed = 10.0f;
     [SerializeField] public float maxStamina = 100.0f;
-    [SerializeField] public float currentStamina;
+    [SerializeField]
+    public float MyCurrentStamina
+    {
+        get => currentStamina;
+        set
+        {
+            currentStamina = value;
+            if (currentStamina <= 0)
+            {
+                staminaDepleted = true;
+            }
+            else if (currentStamina > 10)
+            {
+                staminaDepleted = false;
+            }
+            staminaProgress.ImageProgress = currentStamina / maxStamina;
+        }
+    }
+    private float currentStamina;
+    public bool staminaDepleted = false;
     [SerializeField] public float staminaReduceSpeed = 10.0f;
     [SerializeField] public float staminaRecoverySpeed = 20.0f;
 
     [SerializeField] public float handMaxDistance = 1.0f;
 
     [SerializeField] private float maxAllowedAngle = 45.0f;
-    [SerializeField] private float climbSnapSpeed = 10.0f;
 
     public Vector3 spawnPoint;
     public Quaternion spawnRotation;
 
     public Vector3 handsLocalSpawnPosition;
     public Quaternion handsLocalSpawnRotation;
+
+    [SerializeField] private RadialMenu staminaProgress;
 
     private bool isCliffCoroutineRunning = false;
 
@@ -71,7 +91,7 @@ public class PlayerController : MonoBehaviour
     {
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
-        currentStamina = maxStamina;
+        MyCurrentStamina = maxStamina;
         speed = baseSpeed;
         viewCamera = headCamera.GetComponent<Camera>();
         stateMachine = GetComponent<PlayerStateMachine>();
@@ -105,7 +125,6 @@ public class PlayerController : MonoBehaviour
         if (Application.isFocused)
             Look();
 
-        //Debug.Log(CouldGrabSurface());
     }
 
     public void SetCurrentSpeed(float newValue)
@@ -161,12 +180,18 @@ public class PlayerController : MonoBehaviour
         cameraHolder.localEulerAngles += new Vector3(0, mouseX, 0) * UnityEngine.Time.deltaTime * rotationSpeedY;
 
         Quaternion q = Quaternion.Euler(mouseY, 0, 0) * headCamera.localRotation;
+        Quaternion handsQ = Quaternion.Euler(mouseY, 0, 0) * headCamera.localRotation;
         //cameraAngle = Vector3.Angle(cameraHolder.forward, q.eulerAngles);
 
         if (Mathf.Abs(q.x) <= 0.7)
             headCamera.localRotation = q;
         if (stateMachine.currentState != PlayerStateMachine.StateEnum.Climb)
-            hands.transform.rotation = q;
+        {
+
+            hands.transform.rotation = handsQ;
+            Vector3 handsOffset = headCamera.TransformPoint(new Vector3(handsLocalSpawnPosition.x, -handsLocalSpawnPosition.y, handsLocalSpawnPosition.z));
+            hands.transform.position = handsOffset;
+        }
     }
 
     private void Jump(float height)
@@ -196,6 +221,7 @@ public class PlayerController : MonoBehaviour
 
     private IEnumerator MoveToCliff(Vector3 targetPoint, Quaternion targetRotation)
     {
+        rb.velocity = Vector3.zero;
         Quaternion previousRotation = transform.rotation;
         while (true)
         {
@@ -204,7 +230,7 @@ public class PlayerController : MonoBehaviour
             float step = magnetSpeed * Time.deltaTime;
 
             isCliffCoroutineRunning = true;
-            if (distanceToTarget <= mainCollider.bounds.size.x / 2)
+            if (distanceToTarget <= 1.5f)
                 break;
 
             if (Physics.Raycast(transform.position, direction, step + 0.1f, Physics.AllLayers))
@@ -235,56 +261,56 @@ public class PlayerController : MonoBehaviour
         {
             return;
         }
-        Vector3 move = (hands.transform.right * input.x + hands.transform.up * input.y) * climbingSpeed;
         rb.velocity = Vector3.zero;
+        Vector3 move = (hands.transform.right * input.x + hands.transform.up * input.y) * climbingSpeed;
         rb.AddForce(move, ForceMode.VelocityChange);
 
         Vector3 offset = transform.position - hands.transform.position;
         if (offset.magnitude > handMaxDistance)
-    {
-        Vector3 target = hands.transform.position + offset.normalized * handMaxDistance;
-        transform.position = Vector3.Lerp(transform.position, target, Time.deltaTime * climbSnapSpeed);
-
-    }
-    }
-
-
-
-  void UpdateHandsClimbPosition()
-{
-    Vector3 origin = headCamera.position + headCamera.forward * 0.5f;
-    Vector3 forward = headCamera.forward;
-
-    const int rayCount = 5;
-    const float angleStep = 10f;
-    const float rayDistance = 1f;
-    const float handOffset = 0.05f;
-
-    for (int i = -rayCount / 2; i <= rayCount / 2; i++)
-    {
-        Quaternion rot = Quaternion.AngleAxis(i * angleStep, headCamera.right);
-        Vector3 dir = rot * forward;
-
-        if (Physics.Raycast(origin, dir, out RaycastHit hit, rayDistance, climbCollisions))
         {
-            float angleToUp = Vector3.Angle(hit.normal, Vector3.up);
-            if (angleToUp < maxAllowedAngle) continue; 
-
-            hands.transform.position = hit.point + hit.normal * handOffset;
-            hands.transform.rotation = Quaternion.LookRotation(-hit.normal);
-            return;
+            Vector3 target = hands.transform.position + offset.normalized * handMaxDistance;
+            Vector3 newPosition = Vector3.Lerp(rb.position, target, Time.deltaTime * climbingSpeed);
+            rb.MovePosition(newPosition);
         }
     }
-}
+
+
+
+    void UpdateHandsClimbPosition()
+    {
+        Vector3 origin = headCamera.position + headCamera.forward * 0.5f;
+        Vector3 forward = headCamera.forward;
+
+        const int rayCount = 5;
+        const float angleStep = 10f;
+        const float rayDistance = 1f;
+        const float handOffset = 0.05f;
+
+        for (int i = -rayCount / 2; i <= rayCount / 2; i++)
+        {
+            Quaternion rot = Quaternion.AngleAxis(i * angleStep, headCamera.right);
+            Vector3 dir = rot * forward;
+
+            if (Physics.Raycast(origin, dir, out RaycastHit hit, rayDistance, climbCollisions))
+            {
+                float angleToUp = Vector3.Angle(hit.normal, Vector3.up);
+                if (angleToUp < maxAllowedAngle) continue;
+                Vector3 handsTarget = hit.point + hit.normal * handOffset;
+                hands.transform.position = Vector3.Lerp(hands.transform.position, handsTarget, 0.5f);
+                hands.transform.rotation = Quaternion.LookRotation(-hit.normal);
+                return;
+            }
+        }
+    }
 
     public void ClimbLedge()
     {
-        Debug.Log("Ledge");
+       // Debug.Log("Ledge");
     }
 
     public void ResetHandsPosition()
     {
-        hands.transform.localPosition = handsLocalSpawnPosition; 
+        hands.transform.localPosition = handsLocalSpawnPosition;
         hands.transform.localRotation = handsLocalSpawnRotation;
     }
 

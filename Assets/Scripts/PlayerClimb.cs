@@ -9,7 +9,7 @@ public class PlayerClimb : PlayerState
 {
     // Start is called before the first frame update
 
-    public float ledgeOffset = 2.0f;
+    public float ledgeOffset = 0.3f;
     public float ledgeCheckDistance = 3.0f;
     Rigidbody rb;
     public override void OnEnter()
@@ -19,13 +19,14 @@ public class PlayerClimb : PlayerState
         rb.useGravity = false;
         player.hands.GetComponent<RotationConstraint>().enabled = true;
         player.hands.transform.SetParent(null, true); 
+
+        player.hands.GetComponent<MeshRenderer>().enabled = true;
     }
 
     protected override void FixedUpdate()
     {
-        player.currentStamina -= player.currentStamina * Time.deltaTime * player.staminaReduceSpeed;
-        player.currentStamina = Math.Clamp(player.currentStamina, 0, player.maxStamina);
-
+        player.MyCurrentStamina -= Time.deltaTime * player.staminaReduceSpeed;
+        player.MyCurrentStamina = Math.Clamp(player.MyCurrentStamina, 0, player.maxStamina);
 
 
         if (!player.CouldStartClimb() && CheckLedge())
@@ -37,7 +38,7 @@ public class PlayerClimb : PlayerState
             player.Climb();
         }
 
-        if (!Input.GetMouseButton(0) || player.currentStamina <= 0)
+        if (!Input.GetMouseButton(0) || player.staminaDepleted)
         {
             stateMachine.ChangeState(PlayerStateMachine.StateEnum.Normal);
         }
@@ -51,17 +52,17 @@ public class PlayerClimb : PlayerState
             rb = GetComponent<Rigidbody>();
         }
         rb.useGravity = true;
-        player.hands.GetComponent<RotationConstraint>().enabled = false;
         player.hands.transform.SetParent(player.cameraHolder, true);
         player.ResetHandsPosition();
+        player.hands.GetComponent<MeshRenderer>().enabled = false;
     }
 
     bool CheckLedge()
     {
-        Physics.Raycast(player.headCamera.transform.position, player.headCamera.transform.forward, out RaycastHit hit, player.grabDistance, player.climbCollisions);
+        Physics.Raycast(player.hands.transform.position, player.hands.transform.forward, out RaycastHit hit, player.grabDistance, player.climbCollisions);
 
         Vector3 ledgeCheckOrigin = hit.point + Vector3.up * ledgeOffset;
-        return Physics.Raycast(ledgeCheckOrigin, Vector3.down, out RaycastHit downHit, ledgeCheckDistance);
+        return Physics.Raycast(ledgeCheckOrigin, Vector3.down, ledgeCheckDistance);
 
     }
 
