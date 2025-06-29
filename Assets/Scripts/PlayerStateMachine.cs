@@ -10,7 +10,8 @@ public class PlayerStateMachine : MonoBehaviour
     {
         Normal,
         Climb,
-        Death
+        Death,
+        Dash
 
     }
 
@@ -50,7 +51,6 @@ public class PlayerStateMachine : MonoBehaviour
             FindAction(nextState).enabled = true;
             currentState = nextState;
         }
-
     }
 
     PlayerState FindAction(StateEnum requiredState)

@@ -17,7 +17,7 @@ public class PlayerClimb : PlayerState
         rb = GetComponent<Rigidbody>();
         rb.useGravity = false;
         player.hands.GetComponent<RotationConstraint>().enabled = true;
-        player.hands.transform.SetParent(null, true); 
+        player.hands.transform.SetParent(null, true);
 
         player.hands.GetComponent<MeshRenderer>().enabled = true;
     }
@@ -25,27 +25,24 @@ public class PlayerClimb : PlayerState
     protected override void FixedUpdate()
     {
         player.MyCurrentStamina -= Time.deltaTime * player.staminaReduceSpeed;
-        player.MyCurrentStamina = Math.Clamp(player.MyCurrentStamina, 0, player.maxStamina);
+        
+        player.Climb();
 
-
-        if (!player.CouldStartClimb() && CheckLedge())
+        if (Input.GetKey(KeyCode.LeftShift))
         {
-            player.ClimbLedge();
-        }
-        else
-        {
-            player.Climb();
+            stateMachine.ChangeState(PlayerStateMachine.StateEnum.Dash);
         }
 
         if (!Input.GetMouseButton(0) || player.staminaDepleted)
-        {
-            stateMachine.ChangeState(PlayerStateMachine.StateEnum.Normal);
-        }
+            {
+                stateMachine.ChangeState(PlayerStateMachine.StateEnum.Normal);
+            }
+
     }
 
     public override void OnExit()
     {
-        player.StopCliffMove();
+        //player.StopCliffMove();
         if (rb == null)
         {
             rb = GetComponent<Rigidbody>();
@@ -64,6 +61,8 @@ public class PlayerClimb : PlayerState
         return Physics.Raycast(ledgeCheckOrigin, Vector3.down, ledgeCheckDistance);
 
     }
+
+
 
 
 }

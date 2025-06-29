@@ -28,13 +28,8 @@ public class PlayerController : MonoBehaviour
     private Camera viewCamera;
     private float speed;
     public float mouseScale = 1.0f;
-    private float doubleJumpTimer;
     public float BaseSpeed => baseSpeed;
     public float CurrentSpeed => speed;
-
-    private Coroutine cliffCoroutine;
-
-    [SerializeField] private float magnetSpeed = 0.01f;
 
     [SerializeField] private float climbingSpeed = 10.0f;
     [SerializeField] public float maxStamina = 100.0f;
@@ -44,7 +39,7 @@ public class PlayerController : MonoBehaviour
         get => currentStamina;
         set
         {
-            currentStamina = value;
+            currentStamina = Math.Clamp(value, 0, maxStamina);
             if (currentStamina <= 0)
             {
                 staminaDepleted = true;
@@ -63,7 +58,6 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] public float handMaxDistance = 1.0f;
 
-    [SerializeField] private float maxAllowedAngle = 45.0f;
 
     public Vector3 spawnPoint;
     public Quaternion spawnRotation;
@@ -73,7 +67,9 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] private RadialMenu staminaProgress;
 
-    private bool isCliffCoroutineRunning = false;
+
+    public Vector3 lastMovementDirection;
+    private Vector3 lastPreviousPosition;
 
     void Awake()
     {
@@ -103,11 +99,7 @@ public class PlayerController : MonoBehaviour
 
     public bool CouldStartClimb()
     {
-
         return Physics.Raycast(headCamera.position, headCamera.forward, grabDistance, climbCollisions);
-
-
-
     }
 
     private void Update()
@@ -122,6 +114,15 @@ public class PlayerController : MonoBehaviour
         if (Application.isFocused)
             Look();
 
+        Vector3 currentPosition = transform.position;
+        Vector3 actualMovement = currentPosition - lastPreviousPosition;
+        if (actualMovement.magnitude > 0.01f)
+        {
+        lastMovementDirection = actualMovement.normalized;
+
+        }
+
+        lastPreviousPosition = currentPosition;
     }
 
     public void SetCurrentSpeed(float newValue)
@@ -205,110 +206,138 @@ public class PlayerController : MonoBehaviour
 
     public void GrabCliff()
     {
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out RaycastHit hit, grabDistance, climbCollisions))
-        {
-            //transform.position = hit.point - transform.forward * 0.5f;
-            if (cliffCoroutine != null)
-                StopCoroutine(cliffCoroutine);
+        // Vector3 origin = headCamera.position + headCamera.forward * 0.5f;
+        // Vector3 forward = headCamera.forward;
 
-            cliffCoroutine = StartCoroutine(MoveToCliff(hit.point, Quaternion.LookRotation(-hit.normal, Vector3.up)));
-        }
+        // // const int rayCount = 5;
+        // // const float angleStep = 10f;
+        // const float rayDistance = 1f;
+
+
+        // if (Physics.Raycast(origin, forward, out RaycastHit hit, rayDistance, climbCollisions))
+        // {
+        //     //transform.position = hit.point - transform.forward * 0.5f;
+        //     if (cliffCoroutine != null)
+        //         StopCoroutine(cliffCoroutine);
+
+        //     cliffCoroutine = StartCoroutine(MoveToCliff(hit.point, Quaternion.LookRotation(-hit.normal, Vector3.up)));
+        // }
     }
 
-    private IEnumerator MoveToCliff(Vector3 targetPoint, Quaternion targetRotation)
+    // private IEnumerator MoveToCliff(Vector3 targetPoint, Quaternion targetRotation)
+    // {
+    //     rb.velocity = Vector3.zero;
+    //     Quaternion previousRotation = transform.rotation;
+    //     while (true)
+    //     {
+    //         Vector3 direction = (targetPoint - transform.position).normalized;
+    //         float distanceToTarget = Vector3.Distance(transform.position, targetPoint);
+    //         float step = magnetSpeed * Time.deltaTime;
+
+    //         isCliffCoroutineRunning = true;
+    //         if (distanceToTarget <= 1.5f)
+    //             break;
+
+    //         if (Physics.Raycast(transform.position, direction, step + 0.1f, Physics.AllLayers))
+    //             break;
+
+    //         transform.position += direction * Mathf.Min(step, distanceToTarget);
+    //         // transform.rotation = Quaternion.Slerp(previousRotation, targetRotation, Time.deltaTime * 5f);
+    //         // previousRotation = transform.rotation;
+    //         yield return null;
+    //     }
+    //     isCliffCoroutineRunning = false;
+    //     //transform.rotation = targetRotation;
+    // }
+
+    // public void StopCliffMove()
+    // {
+    //     if (cliffCoroutine != null)
+    //     {
+    //         StopCoroutine(cliffCoroutine);
+    //     }
+    // }
+
+    public void Climb(float forceModifier = 1, ForceMode forceMode = ForceMode.VelocityChange)
     {
         rb.velocity = Vector3.zero;
-        Quaternion previousRotation = transform.rotation;
-        while (true)
-        {
-            Vector3 direction = (targetPoint - transform.position).normalized;
-            float distanceToTarget = Vector3.Distance(transform.position, targetPoint);
-            float step = magnetSpeed * Time.deltaTime;
+        Vector3 surfaceNormal = UpdateHandsPosition();
 
-            isCliffCoroutineRunning = true;
-            if (distanceToTarget <= 1.5f)
-                break;
-
-            if (Physics.Raycast(transform.position, direction, step + 0.1f, Physics.AllLayers))
-                break;
-
-            transform.position += direction * Mathf.Min(step, distanceToTarget);
-            // transform.rotation = Quaternion.Slerp(previousRotation, targetRotation, Time.deltaTime * 5f);
-            // previousRotation = transform.rotation;
-            yield return null;
-        }
-        isCliffCoroutineRunning = false;
-        //transform.rotation = targetRotation;
-    }
-
-    public void StopCliffMove()
-    {
-        if (cliffCoroutine != null)
-        {
-            StopCoroutine(cliffCoroutine);
-        }
-    }
-
-    public void Climb()
-    {
-        UpdateHandsClimbPosition();
         Vector2 input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
-        if (input == Vector2.zero || isCliffCoroutineRunning)
-        {
-            return;
-        }
-        rb.velocity = Vector3.zero;
-        Vector3 move = (hands.transform.right * input.x + hands.transform.up * input.y) * climbingSpeed;
-        rb.AddForce(move, ForceMode.VelocityChange);
 
-        Vector3 offset = transform.position - hands.transform.position;
-        if (offset.magnitude > handMaxDistance)
+        if (input == Vector2.zero) return;
+
+        Vector3 camForward = Vector3.ProjectOnPlane(headCamera.forward, surfaceNormal).normalized;
+        if (camForward.sqrMagnitude < 0.01f)
         {
-            Vector3 target = hands.transform.position + offset.normalized * handMaxDistance;
-            Vector3 newPosition = Vector3.Lerp(rb.position, target, Time.deltaTime * climbingSpeed);
-            rb.MovePosition(newPosition);
+
+            camForward = Vector3.ProjectOnPlane(headCamera.right, surfaceNormal);
+        }
+
+        camForward.Normalize();
+        Vector3 camRight = Vector3.ProjectOnPlane(headCamera.right, surfaceNormal).normalized;
+
+        Vector3 moveDir = camRight * input.x + camForward * input.y;
+
+        rb.AddForce(moveDir.normalized * climbingSpeed * forceModifier, forceMode);
+
+        Vector3 toHands = hands.transform.position - transform.position;
+
+
+        if (toHands.magnitude > handMaxDistance)
+        {
+            Vector3 clampedPosition = hands.transform.position - toHands.normalized * handMaxDistance;
+            rb.position = clampedPosition;
         }
     }
 
 
 
-    void UpdateHandsClimbPosition()
+    Vector3 UpdateHandsPosition()
     {
         Vector3 origin = headCamera.position + headCamera.forward * 0.5f;
-        Vector3 forward = headCamera.forward;
+        Vector3 direction = headCamera.forward;
 
-        const int rayCount = 5;
-        const float angleStep = 10f;
-        const float rayDistance = 1f;
-        const float handOffset = 0.05f;
+        const float rayDistance = 2f;
+        const float lerpSpeed = 10f;
 
-        for (int i = -rayCount / 2; i <= rayCount / 2; i++)
+        if (Physics.Raycast(origin, direction, out RaycastHit hit, rayDistance, climbCollisions))
         {
-            Quaternion rot = Quaternion.AngleAxis(i * angleStep, headCamera.right);
-            Vector3 dir = rot * forward;
+            Vector3 targetPosition = hit.point + hit.normal * -0.01f;
 
-            if (Physics.Raycast(origin, dir, out RaycastHit hit, rayDistance, climbCollisions))
+            Vector3 offsetFromBody = targetPosition - transform.position;
+            if (offsetFromBody.sqrMagnitude > grabDistance * grabDistance)
             {
-                float angleToUp = Vector3.Angle(hit.normal, Vector3.up);
-                if (angleToUp < maxAllowedAngle) continue;
-                Vector3 handsTarget = hit.point + hit.normal * handOffset;
-                hands.transform.position = Vector3.Lerp(hands.transform.position, handsTarget, 0.5f);
-                hands.transform.rotation = Quaternion.LookRotation(-hit.normal);
-                return;
+                offsetFromBody = offsetFromBody.normalized * grabDistance;
+                targetPosition = transform.position + offsetFromBody;
             }
+
+            hands.transform.position = Vector3.Lerp(hands.transform.position, targetPosition, Time.deltaTime * lerpSpeed);
+
+            hands.transform.rotation = Quaternion.LookRotation(-hit.normal);
+            return hit.normal;
         }
+
+        return Vector3.zero;
     }
 
     public void ClimbLedge()
     {
-       // Debug.Log("Ledge");
+        // Debug.Log("Ledge");
     }
 
     public void ResetHandsPosition()
     {
         hands.transform.localPosition = handsLocalSpawnPosition;
         hands.transform.localRotation = handsLocalSpawnRotation;
+    }
+
+    public void Respawn()
+    {
+        transform.position = spawnPoint;
+        transform.rotation = spawnRotation;
+        currentStamina = maxStamina;
+
     }
 
 }

@@ -16,7 +16,6 @@ public class PlayerNormal : PlayerState
     protected override void FixedUpdate()
     {
         player.MyCurrentStamina += Time.deltaTime * player.staminaRecoverySpeed;
-        player.MyCurrentStamina = Math.Clamp(player.MyCurrentStamina, 0.0f, player.maxStamina);
         if (Input.GetKey(KeyCode.W) || Input.GetKey(KeyCode.S) || Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D))
         {
             player.Move();

@@ -50,4 +50,20 @@ public class GameFlow : MonoBehaviour
         Time.timeScale = 0.0f;
         // SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
+    public void Pause()
+    {
+        if (Time.timeScale == 0.0f)
+        {
+            Time.timeScale = 1.0f;
+        }
+        else
+        {
+            Time.timeScale = 0.0f;
+        }
+    }
+
+    public void Return()
+    {
+        SceneManager.LoadScene("Lvl1");
+    }
 }

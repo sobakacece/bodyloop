@@ -9515,18 +9515,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: c2fa2e9e2653e4f4a94c6776faad399a, type: 3}
---- !u!114 &877727309 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5534996273890607898, guid: ddc737c0852fae24d92b273f2dca31cf,
-    type: 3}
-  m_PrefabInstance: {fileID: 934827770}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 22a5b811b84c55041bbf63b4e6c561cb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!1001 &886316418
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -9880,86 +9868,6 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: Player
-      objectReference: {fileID: 0}
-    - target: {fileID: 6041707669237050055, guid: ddc737c0852fae24d92b273f2dca31cf,
-        type: 3}
-      propertyPath: baseSpeed
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 6041707669237050055, guid: ddc737c0852fae24d92b273f2dca31cf,
-        type: 3}
-      propertyPath: jumpHeight
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 6041707669237050055, guid: ddc737c0852fae24d92b273f2dca31cf,
-        type: 3}
-      propertyPath: stateMachine
-      value: 
-      objectReference: {fileID: 877727309}
-    - target: {fileID: 6041707669237050055, guid: ddc737c0852fae24d92b273f2dca31cf,
-        type: 3}
-      propertyPath: climbingSpeed
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 6041707669237050055, guid: ddc737c0852fae24d92b273f2dca31cf,
-        type: 3}
-      propertyPath: rotationSpeedX
-      value: 100
-      objectReference: {fileID: 0}
-    - target: {fileID: 6041707669237050055, guid: ddc737c0852fae24d92b273f2dca31cf,
-        type: 3}
-      propertyPath: rotationSpeedY
-      value: 500
-      objectReference: {fileID: 0}
-    - target: {fileID: 6041707669237050055, guid: ddc737c0852fae24d92b273f2dca31cf,
-        type: 3}
-      propertyPath: staminaDepleted
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 6041707669237050055, guid: ddc737c0852fae24d92b273f2dca31cf,
-        type: 3}
-      propertyPath: staminaReduceSpeed
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 6041707669237050055, guid: ddc737c0852fae24d92b273f2dca31cf,
-        type: 3}
-      propertyPath: staminaRecoverySpeed
-      value: 10
-      objectReference: {fileID: 0}
-    - target: {fileID: 6449753685383214805, guid: ddc737c0852fae24d92b273f2dca31cf,
-        type: 3}
-      propertyPath: m_RenderPostProcessing
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7294940795781762681, guid: ddc737c0852fae24d92b273f2dca31cf,
-        type: 3}
-      propertyPath: m_BackGroundColor.a
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 7294940795781762681, guid: ddc737c0852fae24d92b273f2dca31cf,
-        type: 3}
-      propertyPath: m_BackGroundColor.b
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7294940795781762681, guid: ddc737c0852fae24d92b273f2dca31cf,
-        type: 3}
-      propertyPath: m_BackGroundColor.g
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7294940795781762681, guid: ddc737c0852fae24d92b273f2dca31cf,
-        type: 3}
-      propertyPath: m_BackGroundColor.r
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7469933450700756343, guid: ddc737c0852fae24d92b273f2dca31cf,
-        type: 3}
-      propertyPath: m_Enabled
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 7590126302282881270, guid: ddc737c0852fae24d92b273f2dca31cf,
-        type: 3}
-      propertyPath: m_TagString
-      value: MainCamera
       objectReference: {fileID: 0}
     - target: {fileID: 8638308200436913758, guid: ddc737c0852fae24d92b273f2dca31cf,
         type: 3}

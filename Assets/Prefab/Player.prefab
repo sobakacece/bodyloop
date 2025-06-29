@@ -18,7 +18,8 @@ GameObject:
   - component: {fileID: 6500549939601347387}
   - component: {fileID: 2108549959242884040}
   - component: {fileID: 5053170558713040730}
-  m_Layer: 3
+  - component: {fileID: 2370691340498140086}
+  m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -104,35 +105,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   playerCameraFOV: 60
-  baseSpeed: 10
-  rotationSpeedY: 10
-  rotationSpeedX: 10
+  baseSpeed: 8
+  rotationSpeedY: 500
+  rotationSpeedX: 100
   jumpHeight: 5
   grabDistance: 3
   headCamera: {fileID: 3648555962382487933}
   cameraHolder: {fileID: 2387856492467596027}
   rb: {fileID: 8886252700133780572}
   mainCollider: {fileID: 7563663074827542477}
-  stateMachine: {fileID: 0}
+  stateMachine: {fileID: 5534996273890607898}
   climbCollisions:
     serializedVersion: 2
     m_Bits: 8
   hands: {fileID: 5374442801556485777}
-  mouseScale: 1
-  magnetSpeed: 5
-  climbingSpeed: 7
+  mouseScale: 0.6
+  climbingSpeed: 2
   maxStamina: 100
   staminaDepleted: 0
-  staminaReduceSpeed: 50
-  staminaRecoverySpeed: 20
-  handMaxDistance: 1
-  maxAllowedAngle: 45
-  climbSnapSpeed: 10
+  staminaReduceSpeed: 10
+  staminaRecoverySpeed: 10
+  handMaxDistance: 2
   spawnPoint: {x: 0, y: 0, z: 0}
   spawnRotation: {x: 0, y: 0, z: 0, w: 0}
   handsLocalSpawnPosition: {x: 0, y: 0, z: 0}
   handsLocalSpawnRotation: {x: 0, y: 0, z: 0, w: 0}
   staminaProgress: {fileID: 8519783414909860409}
+  lastMovementDirection: {x: 0, y: 0, z: 0}
 --- !u!54 &8886252700133780572
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -202,6 +201,8 @@ MonoBehaviour:
     action: {fileID: 6500549939601347387}
   - state: 2
     action: {fileID: 2108549959242884040}
+  - state: 3
+    action: {fileID: 2370691340498140086}
   currentState: 0
   player: {fileID: 6041707669237050055}
 --- !u!114 &6500549939601347387
@@ -230,7 +231,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a5ffa4f5eaa12d42a6062d19185df34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerPrefab: {fileID: 857907827663657364}
+  playerPrefab: {fileID: 7257651725886686745, guid: a7cc7954d8f6d0041ab1977ffca582bd,
+    type: 3}
 --- !u!114 &5053170558713040730
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -243,6 +245,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3ebc939dc9592b488e755b5c68a5ae3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2370691340498140086
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 857907827663657364}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 56f6fed1fc0f849438a6fb63987eb009, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  dashImpulse: 5
+  dashTime: 0.2
+  staminaUsage: 15
 --- !u!1 &1653078303727096603
 GameObject:
   m_ObjectHideFlags: 0
@@ -256,7 +273,7 @@ GameObject:
   - component: {fileID: 2617232019886176535}
   - component: {fileID: 4774322750483325492}
   - component: {fileID: 8519783414909860409}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -506,7 +523,7 @@ GameObject:
   - component: {fileID: 256544977254919917}
   - component: {fileID: 50021272717448215}
   - component: {fileID: 7461519708209035646}
-  m_Layer: 5
+  m_Layer: 0
   m_Name: Image
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -584,7 +601,7 @@ GameObject:
   - component: {fileID: 6449753685383214805}
   m_Layer: 0
   m_Name: Camera
-  m_TagString: Untagged
+  m_TagString: MainCamera
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -614,7 +631,7 @@ Camera:
   m_Enabled: 1
   serializedVersion: 2
   m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 1}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0
@@ -686,7 +703,7 @@ MonoBehaviour:
     m_Bits: 1
   m_VolumeTrigger: {fileID: 0}
   m_VolumeFrameworkUpdateModeOption: 2
-  m_RenderPostProcessing: 0
+  m_RenderPostProcessing: 1
   m_Antialiasing: 0
   m_AntialiasingQuality: 2
   m_StopNaN: 0
