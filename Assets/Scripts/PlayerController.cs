@@ -1,9 +1,6 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using Unity.VisualScripting;
-using UnityEditor.UI;
+
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.SceneManagement;

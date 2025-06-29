@@ -1,8 +1,6 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEditor.SceneManagement;
-using UnityEditor.UI;
 using UnityEngine;
 
 public class PlayerStateMachine : MonoBehaviour
