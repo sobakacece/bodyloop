@@ -2,19 +2,23 @@ using System.Collections.Generic;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 
 public class GameFlow : MonoBehaviour
 {
     public int number;
     private static GameFlow instance;
-    private Leaderboard leaderboard;
+    private WinScreen winScreen;
 
     public List<Leaderboard.LeaderboardStruct> leaderboardSave = new List<Leaderboard.LeaderboardStruct>();
 
     public delegate void OnWin();
     public OnWin winEvent;
-    public float currentTime;
+    public double currentTime;
+    [SerializeField]
+    private PauseScreen pauseScreen;
+    //private WinScreen winScreen;
 
     public static GameFlow Instance
     {
@@ -36,34 +40,59 @@ public class GameFlow : MonoBehaviour
     public void Win()
     {
         winEvent?.Invoke();
-        if (leaderboard == null)
+        if (winScreen == null)
         {
-            GameObject prefab = Resources.Load<GameObject>("Prefab/Leaderboard");
-            leaderboard = Instantiate(prefab).GetComponent<Leaderboard>();
-            leaderboard.AddRow(currentTime);
+            GameObject prefab = Resources.Load<GameObject>("Prefab/WinScreen");
+            winScreen = Instantiate(prefab).GetComponent<WinScreen>();
+            // winScreen.AddRow(currentTime);
         }
         else
         {
-            leaderboard.AddRow(currentTime);
+            // winScreen.AddRow(currentTime);
         }
 
-        Time.timeScale = 0.0f;
+        TogglePause();
         // SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
-    public void Pause()
+    public void TogglePause()
     {
         if (Time.timeScale == 0.0f)
         {
             Time.timeScale = 1.0f;
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
         }
         else
         {
             Time.timeScale = 0.0f;
+            Cursor.visible = true;
+            Cursor.lockState = CursorLockMode.None;
         }
+    }
+
+    public void CallPauseMenu()
+    {
+        if (Time.timeScale == 0.0f)
+        {
+            pauseScreen.GoBack();
+        }
+        else
+        {
+            GameObject prefab = Resources.Load<GameObject>("Prefab/PauseScreen");
+            pauseScreen = Instantiate(prefab).GetComponent<PauseScreen>();
+        }
+        TogglePause();
+
     }
 
     public void Return()
     {
-        SceneManager.LoadScene("Lvl1");
+        TogglePause();
+        SceneManager.LoadScene("Lv1");
+    }
+
+    public void LoadLevel()
+    {
+        SceneManager.LoadScene("Lv2");
     }
 }

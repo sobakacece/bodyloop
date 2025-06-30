@@ -4,6 +4,7 @@ using System.Collections;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
@@ -71,6 +72,10 @@ public class PlayerController : MonoBehaviour
     public Vector3 lastMovementDirection;
     private Vector3 lastPreviousPosition;
 
+    public bool inZone;
+    [SerializeField]
+    private Text hintText;
+
     void Awake()
     {
         spawnPoint = transform.position;
@@ -114,6 +119,11 @@ public class PlayerController : MonoBehaviour
         if (Application.isFocused)
             Look();
 
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            GameFlow.Instance.CallPauseMenu();
+        }
+
         Vector3 currentPosition = transform.position;
         Vector3 actualMovement = currentPosition - lastPreviousPosition;
         if (actualMovement.magnitude > 0.01f)
@@ -122,7 +132,17 @@ public class PlayerController : MonoBehaviour
 
         }
 
+        if (inZone && Input.GetKeyDown(KeyCode.E))
+        {
+            GameFlow.Instance.LoadLevel();
+        }
+
         lastPreviousPosition = currentPosition;
+    }
+
+    public void UpdateHintText(string hint)
+    {
+        hintText.text = hint;
     }
 
     public void SetCurrentSpeed(float newValue)

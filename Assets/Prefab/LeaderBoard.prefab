@@ -98,7 +98,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Leaderboard
+  m_text: LISTEN CAREFULLY
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
@@ -295,17 +295,17 @@ PrefabInstance:
     - target: {fileID: -8679921383154817045, guid: 98b319a39577c824a8511d7cd204b96a,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.00070981
+      value: 251.3
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 98b319a39577c824a8511d7cd204b96a,
         type: 3}
       propertyPath: m_LocalPosition.y
-      value: 6.23
+      value: 147.7
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 98b319a39577c824a8511d7cd204b96a,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -1.27
+      value: -1.3
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 98b319a39577c824a8511d7cd204b96a,
         type: 3}

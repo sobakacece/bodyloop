@@ -2,27 +2,37 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using System.Diagnostics;
+using System;
 
 public class Timer : MonoBehaviour
 {
     private Text timerText;
-    private float startTime;
+    private Stopwatch stopwatch;
 
-    private float elapsed;
+    public double elapsed; // In seconds with sub-millisecond precision
 
-    // Start is called before the first frame update
     void Start()
     {
-        startTime = Time.time;
         timerText = GetComponent<Text>();
-        GameFlow.Instance.winEvent += () => GameFlow.Instance.currentTime = elapsed;
+        stopwatch = new Stopwatch();
+        stopwatch.Start();
+
+        GameFlow.Instance.winEvent += () =>
+        {
+            stopwatch.Stop();
+            elapsed = stopwatch.Elapsed.TotalSeconds;
+            GameFlow.Instance.currentTime = elapsed;
+        };
     }
 
-    // Update is called once per frame
     void Update()
     {
-    elapsed = Time.time - startTime;
-    timerText.text = $"{(int)(elapsed / 60):00}:{(int)(elapsed % 60):00}";
-        
+        double time = stopwatch.Elapsed.TotalSeconds;
+        int minutes = (int)(time / 60);
+        int seconds = (int)(time % 60);
+        int microseconds = (int)((time - Math.Truncate(time)) * 1_000) % 1_000;
+
+        timerText.text = $"{minutes:00}:{seconds:00}:{microseconds:000}";
     }
 }
