@@ -93,6 +93,7 @@ public class PlayerController : MonoBehaviour
         speed = baseSpeed;
         viewCamera = headCamera.GetComponent<Camera>();
         stateMachine = GetComponent<PlayerStateMachine>();
+        GameFlow.Instance.Crutch();
 
     }
 

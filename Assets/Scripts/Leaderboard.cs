@@ -8,7 +8,10 @@ using System;
 public class Leaderboard : MonoBehaviour
 {
     private List<LeaderboardStruct> leadearsArray = new List<LeaderboardStruct>();
-    private int maxLeaders = 10;
+    [SerializeField]
+    private int maxLeaders = 5;
+    [SerializeField]
+    private VerticalLayoutGroup leaderboardPanel;
     [SerializeField]
     private VerticalLayoutGroup mainPanel;
     [SerializeField]
@@ -19,12 +22,13 @@ public class Leaderboard : MonoBehaviour
 
     [SerializeField]
     // Start is called before the first frame update
-    public void AddRow(float time)
+    public void AddRow(string time)
     {
         leadearsArray = GameFlow.Instance.leaderboardSave;
         LeaderboardStruct newRow = new LeaderboardStruct(time, playerName);
         leadearsArray.Add(newRow);
         leadearsArray  = leadearsArray.OrderBy(x => x.MyTime).ToList();
+        
         if (leadearsArray.Count > maxLeaders)
         {
             leadearsArray.RemoveRange(maxLeaders, leadearsArray.Count - maxLeaders);
@@ -40,15 +44,32 @@ public class Leaderboard : MonoBehaviour
         FillTable();
     }
 
+    public void Appear()
+    {
+        mainPanel.transform.LeanMoveLocal(new Vector2(0, 0), 1).setEaseOutQuart().setIgnoreTimeScale(true);
+        gameObject.SetActive(true);
+    }
+    public void Hide()
+    {
+        LTDescr hideAnim = mainPanel.transform.LeanMoveLocal(new Vector2(0, -451), 1).setEaseOutQuart().setIgnoreTimeScale(true);
+        StartCoroutine(TurnOff(hideAnim.time));
+    }
+
+    IEnumerator TurnOff(float seconds)
+    {
+        yield return new WaitForSecondsRealtime(seconds);
+        Destroy(gameObject);
+    }
     void FillTable()
     {
-        foreach (Transform child in mainPanel.gameObject.transform)
+        foreach (Transform child in leaderboardPanel.gameObject.transform)
         {
             Destroy(child.gameObject);
         }
         foreach (LeaderboardStruct row in leadearsArray)
         {
-            GameObject obj = Instantiate(leaderBoardRow, mainPanel.gameObject.transform);
+            Debug.Log(row.MyTime + row.MyName + row.MyPlace);
+            GameObject obj = Instantiate(leaderBoardRow, leaderboardPanel.gameObject.transform);
             obj.GetComponent<LeaderboardRow>().Setup(row.MyTime, row.MyName, row.MyPlace);
         }
 
@@ -56,7 +77,8 @@ public class Leaderboard : MonoBehaviour
 
     void Start()
     {
-        button.onClick.AddListener(GameFlow.Instance.GameRestart);
+        button.onClick.AddListener(Hide);
+        //Hide();
     }
 
     public void UpdateCurrentPlayer(string name)
@@ -66,11 +88,11 @@ public class Leaderboard : MonoBehaviour
 
     public class LeaderboardStruct
     {
-        public float MyTime;
+        public string MyTime;
         public string MyName;
         public int MyPlace;
 
-        public LeaderboardStruct(float time, string name)
+        public LeaderboardStruct(string time, string name)
         {
             MyTime = time;
             MyName = name;

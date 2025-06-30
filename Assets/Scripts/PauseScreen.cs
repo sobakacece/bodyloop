@@ -15,13 +15,23 @@ public class PauseScreen : MonoBehaviour
     [SerializeField]
     private GameObject mainPanel;
 
+    [SerializeField]
+    private Slider volumeSlider;
+
     void Start()
     {
         buttonRestart.onClick.AddListener(GameFlow.Instance.GameRestart);
         buttonPause.onClick.AddListener(GameFlow.Instance.CallPauseMenu);
         buttonQuit.onClick.AddListener(GameFlow.Instance.Return);
+        volumeSlider.onValueChanged.AddListener(OnSliderVolumeChange);
+        volumeSlider.value = GameFlow.Instance.musicPlayer.baseVolume;
         mainPanel.transform.position = new Vector3(2560 + 1280, 720, 0);
         PlayAnimation(false);
+    }
+
+    void OnSliderVolumeChange(float value)
+    {
+        GameFlow.Instance.musicPlayer.ChangeVolume(value);
     }
 
     // Update is called once per frame

@@ -11,14 +11,14 @@ public class LeaderboardRow : MonoBehaviour
     private Text placeLable;
     [SerializeField]
     private Text nameLabel;
-    private float playerTime = 0.0f;
-    public float MyTime
+    private string playerTime = "00:00:000";
+    public string MyTextTime
     {
         get => playerTime;
         private set
         {
             playerTime = value;
-            timeLabel.text = $"{(int)(playerTime / 60):00}:{(int)(playerTime % 60):00}";
+            timeLabel.text = playerTime;
         }
     }
     private string playerName = "Daren";
@@ -42,9 +42,9 @@ public class LeaderboardRow : MonoBehaviour
         }
     }
 
-    public void Setup(float time, string name, int place)
+    public void Setup(string time, string name, int place)
     {
-        MyTime = time;
+        MyTextTime = time;
         MyName = name;
         MyPlace = place;   
     }

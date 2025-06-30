@@ -724,6 +724,7 @@ MonoBehaviour:
   buttonPause: {fileID: 783054879354273708}
   buttonQuit: {fileID: 2883398792950206300}
   mainPanel: {fileID: 6546663583970975227}
+  volumeSlider: {fileID: 3998958791412241339}
 --- !u!1 &6546663583970975227
 GameObject:
   m_ObjectHideFlags: 0

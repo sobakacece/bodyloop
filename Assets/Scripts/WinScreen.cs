@@ -12,17 +12,29 @@ public class WinScreen : MonoBehaviour
     [SerializeField]
     private Button buttonQuit;
     [SerializeField]
+    private Button buttonLeaderboard;
+    [SerializeField]
     private GameObject mainPanel;
     [SerializeField]
     private Text currentTime;
+    private Leaderboard leaderboard;
 
     void Start()
     {
         buttonRestart.onClick.AddListener(GoBack);
         buttonQuit.onClick.AddListener(GameFlow.Instance.Return);
+        buttonLeaderboard.onClick.AddListener(CallLeaderboard);
         SetCurrenTime();
         mainPanel.transform.position = new Vector3(2560 + 1280, 720, 0);
         PlayAnimation(false);
+        GameObject prefab = Resources.Load<GameObject>("Prefab/Leaderboard");
+        leaderboard = Instantiate(prefab, gameObject.transform).GetComponent<Leaderboard>();
+        leaderboard.AddRow(currentTime.text);
+    }
+    private void CallLeaderboard()
+    {
+        leaderboard.gameObject.SetActive(false);
+        leaderboard.Appear();
     }
 
     // Update is called once per frame

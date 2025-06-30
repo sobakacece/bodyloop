@@ -11,13 +11,16 @@ public class GameFlow : MonoBehaviour
     private static GameFlow instance;
     private WinScreen winScreen;
 
-    public List<Leaderboard.LeaderboardStruct> leaderboardSave = new List<Leaderboard.LeaderboardStruct>();
+    public List<Leaderboard.LeaderboardStruct> leaderboardSave = new List<Leaderboard.LeaderboardStruct>()
+    { new Leaderboard.LeaderboardStruct("01:00:00", "Daren"), new Leaderboard.LeaderboardStruct("02:00:00", "Romu"), new Leaderboard.LeaderboardStruct("03:00:00", "Yaroslave"),
+    new Leaderboard.LeaderboardStruct("04:00:00", "Egor"), new Leaderboard.LeaderboardStruct("05:00:00", "Vlad")};
 
     public delegate void OnWin();
     public OnWin winEvent;
     public double currentTime;
     [SerializeField]
     private PauseScreen pauseScreen;
+    public MusicPlayer musicPlayer;
     //private WinScreen winScreen;
 
     public static GameFlow Instance
@@ -29,6 +32,14 @@ public class GameFlow : MonoBehaviour
     void Start()
     {
         DontDestroyOnLoad(instance);
+        GameObject musicPrefab = Resources.Load<GameObject>("Prefab/MusicPlayer");
+        musicPlayer = Instantiate(musicPrefab).GetComponent<MusicPlayer>();
+        DontDestroyOnLoad(musicPlayer.gameObject);
+        // musicPlayer.ChangeMusic("Lv1", 0);  
+    }
+    public void Crutch()
+    {
+
     }
 
     public void GameRestart()
@@ -44,11 +55,9 @@ public class GameFlow : MonoBehaviour
         {
             GameObject prefab = Resources.Load<GameObject>("Prefab/WinScreen");
             winScreen = Instantiate(prefab).GetComponent<WinScreen>();
-            // winScreen.AddRow(currentTime);
         }
         else
         {
-            // winScreen.AddRow(currentTime);
         }
 
         TogglePause();
@@ -89,10 +98,17 @@ public class GameFlow : MonoBehaviour
     {
         TogglePause();
         SceneManager.LoadScene("Lv1");
+        musicPlayer.ChangeMusic("Lv1", 1);
     }
 
     public void LoadLevel()
     {
         SceneManager.LoadScene("Lv2");
+        musicPlayer.ChangeMusic("Lv2", 1);
+    }
+
+    public void ChangeVolume(float volume)
+    {
+        musicPlayer.ChangeVolume(volume); 
     }
 }
