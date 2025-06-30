@@ -106,8 +106,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   playerCameraFOV: 60
   baseSpeed: 8
-  rotationSpeedY: 500
-  rotationSpeedX: 100
+  rotationSpeedY: 450
+  rotationSpeedX: 450
   jumpHeight: 5
   grabDistance: 3
   headCamera: {fileID: 3648555962382487933}
@@ -119,7 +119,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   hands: {fileID: 5374442801556485777}
-  mouseScale: 0.6
+  mouseScale: 0.3
   climbingSpeed: 2
   maxStamina: 100
   staminaDepleted: 0

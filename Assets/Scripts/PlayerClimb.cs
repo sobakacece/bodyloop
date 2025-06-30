@@ -13,7 +13,6 @@ public class PlayerClimb : PlayerState
     Rigidbody rb;
     public override void OnEnter()
     {
-        player.GrabCliff();
         rb = GetComponent<Rigidbody>();
         rb.useGravity = false;
         player.hands.GetComponent<RotationConstraint>().enabled = true;

@@ -17,6 +17,8 @@ public class PauseScreen : MonoBehaviour
 
     [SerializeField]
     private Slider volumeSlider;
+    [SerializeField]
+    private Slider sensSlider;
 
     void Start()
     {
@@ -24,14 +26,20 @@ public class PauseScreen : MonoBehaviour
         buttonPause.onClick.AddListener(GameFlow.Instance.CallPauseMenu);
         buttonQuit.onClick.AddListener(GameFlow.Instance.Return);
         volumeSlider.onValueChanged.AddListener(OnSliderVolumeChange);
+        sensSlider.onValueChanged.AddListener(OnSliderSensChange);
         volumeSlider.value = GameFlow.Instance.musicPlayer.baseVolume;
         mainPanel.transform.position = new Vector3(2560 + 1280, 720, 0);
         PlayAnimation(false);
+        sensSlider.value = GameFlow.Instance.baseSens;
     }
 
     void OnSliderVolumeChange(float value)
     {
         GameFlow.Instance.musicPlayer.ChangeVolume(value);
+    }
+    void OnSliderSensChange(float value)
+    {
+        GameFlow.Instance.ChangeSens(value);
     }
 
     // Update is called once per frame

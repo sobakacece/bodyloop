@@ -17,16 +17,25 @@ public class GameFlow : MonoBehaviour
 
     public delegate void OnWin();
     public OnWin winEvent;
+    public delegate void OnSensChanged(float value);
+    public OnSensChanged sensetivityChanged;
     public double currentTime;
     [SerializeField]
     private PauseScreen pauseScreen;
     public MusicPlayer musicPlayer;
+    public float baseSens = 0.3f;
     //private WinScreen winScreen;
 
     public static GameFlow Instance
     {
 
         get { return instance ?? (instance = new GameObject("Singleton").AddComponent<GameFlow>()); }
+    }
+
+    public void ChangeSens(float value)
+    {
+        baseSens = value;
+        sensetivityChanged?.Invoke(value);
     }
 
     void Start()

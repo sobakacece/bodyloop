@@ -1,6 +1,5 @@
 using System;
 using System.Collections;
-
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.SceneManagement;
@@ -93,7 +92,11 @@ public class PlayerController : MonoBehaviour
         speed = baseSpeed;
         viewCamera = headCamera.GetComponent<Camera>();
         stateMachine = GetComponent<PlayerStateMachine>();
-        GameFlow.Instance.Crutch();
+        GameFlow.Instance.sensetivityChanged += (float value) =>
+        {
+            mouseScale = value;
+        };
+        mouseScale = GameFlow.Instance.baseSens;
 
     }
 
@@ -193,10 +196,10 @@ public class PlayerController : MonoBehaviour
 
     private void Look()
     {
-        float mouseX = Input.GetAxis("Mouse X") * mouseScale;
-        float mouseY = -Input.GetAxis("Mouse Y") * UnityEngine.Time.deltaTime * rotationSpeedY * mouseScale;
+        float mouseX = Input.GetAxis("Mouse X") * mouseScale * Time.unscaledDeltaTime;
+        float mouseY = -Input.GetAxis("Mouse Y") * rotationSpeedY * mouseScale * Time.unscaledDeltaTime;
         //Debug.Log($"{nameof(mouseX)} {mouseX}; {nameof(mouseY)} {mouseY};");
-        cameraHolder.localEulerAngles += new Vector3(0, mouseX, 0) * UnityEngine.Time.deltaTime * rotationSpeedY;
+        cameraHolder.localEulerAngles += new Vector3(0, mouseX, 0) * rotationSpeedY;
 
         Quaternion q = Quaternion.Euler(mouseY, 0, 0) * headCamera.localRotation;
         Quaternion handsQ = Quaternion.Euler(mouseY, 0, 0) * headCamera.localRotation;
@@ -218,66 +221,8 @@ public class PlayerController : MonoBehaviour
         stateMachine.ChangeState(PlayerStateMachine.StateEnum.Normal);
         rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
         rb.AddForce(Vector3.up * height, ForceMode.Impulse);
-    }
+}
 
-    private void OnGUI()
-    {
-        GUI.Label(new Rect(30, 30, 360, 180), $"CurrentState: {stateMachine.currentState}");
-    }
-
-    public void GrabCliff()
-    {
-        // Vector3 origin = headCamera.position + headCamera.forward * 0.5f;
-        // Vector3 forward = headCamera.forward;
-
-        // // const int rayCount = 5;
-        // // const float angleStep = 10f;
-        // const float rayDistance = 1f;
-
-
-        // if (Physics.Raycast(origin, forward, out RaycastHit hit, rayDistance, climbCollisions))
-        // {
-        //     //transform.position = hit.point - transform.forward * 0.5f;
-        //     if (cliffCoroutine != null)
-        //         StopCoroutine(cliffCoroutine);
-
-        //     cliffCoroutine = StartCoroutine(MoveToCliff(hit.point, Quaternion.LookRotation(-hit.normal, Vector3.up)));
-        // }
-    }
-
-    // private IEnumerator MoveToCliff(Vector3 targetPoint, Quaternion targetRotation)
-    // {
-    //     rb.velocity = Vector3.zero;
-    //     Quaternion previousRotation = transform.rotation;
-    //     while (true)
-    //     {
-    //         Vector3 direction = (targetPoint - transform.position).normalized;
-    //         float distanceToTarget = Vector3.Distance(transform.position, targetPoint);
-    //         float step = magnetSpeed * Time.deltaTime;
-
-    //         isCliffCoroutineRunning = true;
-    //         if (distanceToTarget <= 1.5f)
-    //             break;
-
-    //         if (Physics.Raycast(transform.position, direction, step + 0.1f, Physics.AllLayers))
-    //             break;
-
-    //         transform.position += direction * Mathf.Min(step, distanceToTarget);
-    //         // transform.rotation = Quaternion.Slerp(previousRotation, targetRotation, Time.deltaTime * 5f);
-    //         // previousRotation = transform.rotation;
-    //         yield return null;
-    //     }
-    //     isCliffCoroutineRunning = false;
-    //     //transform.rotation = targetRotation;
-    // }
-
-    // public void StopCliffMove()
-    // {
-    //     if (cliffCoroutine != null)
-    //     {
-    //         StopCoroutine(cliffCoroutine);
-    //     }
-    // }
 
     public void Climb(float forceModifier = 1, ForceMode forceMode = ForceMode.VelocityChange)
     {

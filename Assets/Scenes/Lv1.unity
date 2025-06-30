@@ -3090,23 +3090,8 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6041707669237050055, guid: ddc737c0852fae24d92b273f2dca31cf,
         type: 3}
-      propertyPath: climbingSpeed
-      value: 7
-      objectReference: {fileID: 0}
-    - target: {fileID: 6041707669237050055, guid: ddc737c0852fae24d92b273f2dca31cf,
-        type: 3}
       propertyPath: currentStamina
       value: 100
-      objectReference: {fileID: 0}
-    - target: {fileID: 6041707669237050055, guid: ddc737c0852fae24d92b273f2dca31cf,
-        type: 3}
-      propertyPath: rotationSpeedX
-      value: 450
-      objectReference: {fileID: 0}
-    - target: {fileID: 6041707669237050055, guid: ddc737c0852fae24d92b273f2dca31cf,
-        type: 3}
-      propertyPath: rotationSpeedY
-      value: 450
       objectReference: {fileID: 0}
     - target: {fileID: 6449753685383214805, guid: ddc737c0852fae24d92b273f2dca31cf,
         type: 3}
