@@ -38,10 +38,19 @@ public class Spike : MonoBehaviour
     private IEnumerator AttachRagdoll()
     {
         yield return new WaitForEndOfFrame();
-        //Vector3 freeSpot = FindEmptySpawnPoint(coll.contacts[0].point, coll.contacts[0].normal, playerPrefab.GetComponentInChildren<SkinnedMeshRenderer>().bounds.size, 6, layerMask);
-        Instantiate(playerPrefab, coll.contacts[0].point, coll.body.gameObject.transform.rotation);
+        
+        Instantiate(playerPrefab, coll.contacts[0].point, GetSurfaceAlignedRotation(coll.contacts[0].normal, -coll.contacts[0].normal));
 
     }
+
+    Quaternion GetSurfaceAlignedRotation(Vector3 surfaceNormal, Vector3 preferredForward)
+    {
+        if (Vector3.Dot(surfaceNormal.normalized, preferredForward.normalized) > 0.99f)
+            preferredForward = Vector3.Cross(surfaceNormal, Vector3.right);
+
+        return Quaternion.LookRotation(Vector3.ProjectOnPlane(preferredForward, surfaceNormal).normalized, surfaceNormal);
+    }
+
 
     // Vector3 FindEmptySpawnPoint(Vector3 origin, Vector3 surfaceNormal, Vector3 size, float radius, LayerMask checkMask)
     // {
