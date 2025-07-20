@@ -14,7 +14,7 @@ public class PlayerDash : PlayerState
     public override void OnEnter()
     {
         rb = player.GetComponent<Rigidbody>();
-        Physics.Raycast(player.transform.position, player.transform.forward, out RaycastHit hit, 2.0f, player.climbCollisions);
+        Physics.Raycast(player.hands.transform.position, player.hands.transform.forward, out RaycastHit hit, 2.0f, player.climbCollisions);
         rb.AddForce(Vector3.ProjectOnPlane(player.lastMovementDirection, hit.normal) * dashImpulse, ForceMode.Impulse);
         rb.useGravity = false;
         player.MyCurrentStamina -= staminaUsage;

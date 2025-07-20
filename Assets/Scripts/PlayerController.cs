@@ -113,6 +113,7 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
+        Debug.Log(hands.transform.forward);
         if (Input.GetKeyDown(KeyCode.Space) && IsGrounded())
             Jump(jumpHeight);
 
@@ -132,7 +133,7 @@ public class PlayerController : MonoBehaviour
         Vector3 actualMovement = currentPosition - lastPreviousPosition;
         if (actualMovement.magnitude > 0.01f)
         {
-        lastMovementDirection = actualMovement.normalized;
+            lastMovementDirection = actualMovement.normalized;
 
         }
 
@@ -221,7 +222,7 @@ public class PlayerController : MonoBehaviour
         stateMachine.ChangeState(PlayerStateMachine.StateEnum.Normal);
         rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
         rb.AddForce(Vector3.up * height, ForceMode.Impulse);
-}
+    }
 
 
     public void Climb(float forceModifier = 1, ForceMode forceMode = ForceMode.VelocityChange)

@@ -583,6 +583,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6041707669237050055, guid: ddc737c0852fae24d92b273f2dca31cf,
         type: 3}
+      propertyPath: maxStamina
+      value: 1000
+      objectReference: {fileID: 0}
+    - target: {fileID: 6041707669237050055, guid: ddc737c0852fae24d92b273f2dca31cf,
+        type: 3}
       propertyPath: stateMachine
       value: 
       objectReference: {fileID: 167617824}
