@@ -65,6 +65,7 @@ public class PlayerController : MonoBehaviour
     public Vector3 handsLocalSpawnPosition;
     public Quaternion handsLocalSpawnRotation;
 
+    [SerializeField] private GameObject hudPrefab;
     [SerializeField] private RadialMenu staminaProgress;
 
 
@@ -83,9 +84,16 @@ public class PlayerController : MonoBehaviour
         handsLocalSpawnPosition = hands.transform.localPosition;
         handsLocalSpawnRotation = hands.transform.localRotation;
 
+
+
     }
     private void Start()
     {
+        GameObject hudInstance = Instantiate(hudPrefab);
+        //.transform.SetParent(hands.transform);
+        staminaProgress = hudInstance.GetComponent<RadialMenu>();
+
+
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
         MyCurrentStamina = maxStamina;
@@ -113,7 +121,7 @@ public class PlayerController : MonoBehaviour
 
     private void Update()
     {
-        Debug.Log(hands.transform.forward);
+        //        Debug.Log(hands.transform.forward);
         if (Input.GetKeyDown(KeyCode.Space) && IsGrounded())
             Jump(jumpHeight);
 
@@ -228,34 +236,34 @@ public class PlayerController : MonoBehaviour
     public void Climb(float forceModifier = 1, ForceMode forceMode = ForceMode.VelocityChange)
     {
         rb.velocity = Vector3.zero;
-        Vector3 surfaceNormal = UpdateHandsPosition();
+        // Vector3 surfaceNormal = UpdateHandsPosition();
 
-        Vector2 input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+        // Vector2 input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
 
-        if (input == Vector2.zero) return;
+        // if (input == Vector2.zero) return;
 
-        Vector3 camForward = Vector3.ProjectOnPlane(headCamera.forward, surfaceNormal).normalized;
-        if (camForward.sqrMagnitude < 0.01f)
-        {
+        // Vector3 camForward = Vector3.ProjectOnPlane(headCamera.forward, surfaceNormal).normalized;
+        // if (camForward.sqrMagnitude < 0.01f)
+        // {
 
-            camForward = Vector3.ProjectOnPlane(headCamera.right, surfaceNormal);
-        }
+        //     camForward = Vector3.ProjectOnPlane(headCamera.right, surfaceNormal);
+        // }
 
-        camForward.Normalize();
-        Vector3 camRight = Vector3.ProjectOnPlane(headCamera.right, surfaceNormal).normalized;
+        // camForward.Normalize();
+        // Vector3 camRight = Vector3.ProjectOnPlane(headCamera.right, surfaceNormal).normalized;
 
-        Vector3 moveDir = camRight * input.x + camForward * input.y;
+        // Vector3 moveDir = camRight * input.x + camForward * input.y;
 
-        rb.AddForce(moveDir.normalized * climbingSpeed * forceModifier, forceMode);
+        // rb.AddForce(moveDir.normalized * climbingSpeed * forceModifier, forceMode);
 
-        Vector3 toHands = hands.transform.position - transform.position;
+        // Vector3 toHands = hands.transform.position - transform.position;
 
 
-        if (toHands.magnitude > handMaxDistance)
-        {
-            Vector3 clampedPosition = hands.transform.position - toHands.normalized * handMaxDistance;
-            rb.position = clampedPosition;
-        }
+        // if (toHands.magnitude > handMaxDistance)
+        // {
+        //     Vector3 clampedPosition = hands.transform.position - toHands.normalized * handMaxDistance;
+        //     rb.position = clampedPosition;
+        // }
     }
 
 

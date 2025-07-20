@@ -14,9 +14,9 @@ public class PlayerClimb : PlayerState
     public override void OnEnter()
     {
         rb = GetComponent<Rigidbody>();
-        rb.useGravity = false;
-        player.hands.GetComponent<RotationConstraint>().enabled = true;
-        player.hands.transform.SetParent(null, true);
+        // rb.useGravity = false;
+        // player.hands.GetComponent<RotationConstraint>().enabled = true;
+        // player.hands.transform.SetParent(null, true);
 
         player.hands.GetComponent<MeshRenderer>().enabled = true;
     }

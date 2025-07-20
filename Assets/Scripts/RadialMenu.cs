@@ -16,6 +16,7 @@ public class RadialMenu : MonoBehaviour
         {
             progress = value;
             loadingImage.fillAmount = progress;
+            //Debug.Log(progress);
             if (progress < 0.1f)
                 loadingImage.color = Color.Lerp(loadingImage.color, Color.red, progress * 0.5f);
             else if (progress < 0.25f)
