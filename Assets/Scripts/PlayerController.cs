@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float baseSpeed;
     [SerializeField] private float rotationSpeedY, rotationSpeedX;
     [SerializeField] private float jumpHeight;
-    [SerializeField] public float grabDistance;
+    [SerializeField] public float grabDistance = 2.0f;
 
     [SerializeField] public Transform headCamera;
     [SerializeField] public Transform cameraHolder;
@@ -53,10 +53,12 @@ public class PlayerController : MonoBehaviour
     }
     private float currentStamina;
     public bool staminaDepleted = false;
+    public bool isCliffCoroutineRunning = false;
     [SerializeField] public float staminaReduceSpeed = 10.0f;
     [SerializeField] public float staminaRecoverySpeed = 20.0f;
 
     [SerializeField] public float handMaxDistance = 1.0f;
+    [SerializeField] public float magnetSpeed = 2.0f;
 
 
     public Vector3 spawnPoint;
@@ -236,34 +238,28 @@ public class PlayerController : MonoBehaviour
     public void Climb(float forceModifier = 1, ForceMode forceMode = ForceMode.VelocityChange)
     {
         rb.velocity = Vector3.zero;
-        // Vector3 surfaceNormal = UpdateHandsPosition();
 
-        // Vector2 input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+        Vector2 input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+        if (input == Vector2.zero) return;
 
-        // if (input == Vector2.zero) return;
+        Vector3 delta = (headCamera.forward * input.y + headCamera.right * input.x).normalized * climbingSpeed * Time.deltaTime;
 
-        // Vector3 camForward = Vector3.ProjectOnPlane(headCamera.forward, surfaceNormal).normalized;
-        // if (camForward.sqrMagnitude < 0.01f)
-        // {
-
-        //     camForward = Vector3.ProjectOnPlane(headCamera.right, surfaceNormal);
-        // }
-
-        // camForward.Normalize();
-        // Vector3 camRight = Vector3.ProjectOnPlane(headCamera.right, surfaceNormal).normalized;
-
-        // Vector3 moveDir = camRight * input.x + camForward * input.y;
-
-        // rb.AddForce(moveDir.normalized * climbingSpeed * forceModifier, forceMode);
-
-        // Vector3 toHands = hands.transform.position - transform.position;
+        Debug.Log(headCamera.forward);
 
 
-        // if (toHands.magnitude > handMaxDistance)
-        // {
-        //     Vector3 clampedPosition = hands.transform.position - toHands.normalized * handMaxDistance;
-        //     rb.position = clampedPosition;
-        // }
+        Vector3 toHands = hands.transform.position - transform.position;
+
+
+        if (toHands.magnitude > handMaxDistance)
+        {
+            Vector3 clampedPosition = hands.transform.position - toHands.normalized * handMaxDistance;
+            rb.position = clampedPosition;
+        }
+        else
+        {
+
+            rb.MovePosition(transform.position + delta);
+        }
     }
 
 
@@ -296,6 +292,17 @@ public class PlayerController : MonoBehaviour
         return Vector3.zero;
     }
 
+    public RaycastHit HandsRay()
+    {
+        Vector3 origin = headCamera.position + headCamera.forward * 0.5f;
+        Vector3 direction = headCamera.forward;
+
+        const float rayDistance = 2f;
+
+        Physics.Raycast(origin, direction, out RaycastHit hit, rayDistance, climbCollisions);
+        return hit;
+    }
+
     public void ClimbLedge()
     {
         // Debug.Log("Ledge");
@@ -313,6 +320,32 @@ public class PlayerController : MonoBehaviour
         transform.rotation = spawnRotation;
         currentStamina = maxStamina;
 
+    }
+
+    public IEnumerator MoveToCliff(Vector3 targetPoint)
+    {
+        rb.velocity = Vector3.zero;
+        //Quaternion previousRotation = transform.rotation;
+        while (true)
+        {
+            Vector3 direction = (targetPoint - hands.transform.position).normalized;
+            float distanceToTarget = Vector3.Distance(hands.transform.position, targetPoint);
+            float step = magnetSpeed * Time.deltaTime;
+
+            isCliffCoroutineRunning = true;
+            if (distanceToTarget <= 0.2f)
+                break;
+
+            if (Physics.Raycast(hands.transform.position, direction, step + 0.1f, Physics.AllLayers))
+                break;
+
+            hands.transform.position += direction * Mathf.Min(step, distanceToTarget);
+            // transform.rotation = Quaternion.Slerp(previousRotation, targetRotation, Time.deltaTime * 5f);
+            // previousRotation = transform.rotation;
+            yield return null;
+        }
+        isCliffCoroutineRunning = false;
+        //transform.rotation = targetRotation;
     }
 
 }

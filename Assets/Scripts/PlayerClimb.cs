@@ -10,38 +10,51 @@ public class PlayerClimb : PlayerState
 
     public float ledgeOffset = 0.3f;
     public float ledgeCheckDistance = 3.0f;
+
+    Coroutine cliffCoroutine;
     Rigidbody rb;
     public override void OnEnter()
     {
         rb = GetComponent<Rigidbody>();
-        // rb.useGravity = false;
+        rb.useGravity = false;
         // player.hands.GetComponent<RotationConstraint>().enabled = true;
-        // player.hands.transform.SetParent(null, true);
+        player.hands.transform.SetParent(null, true);
 
         player.hands.GetComponent<MeshRenderer>().enabled = true;
+        if (cliffCoroutine != null)
+        {
+            StopCoroutine(cliffCoroutine);
+        }
+        Debug.Log("start");
+        RaycastHit hit = player.HandsRay();
+        cliffCoroutine = StartCoroutine(player.MoveToCliff(hit.point));
+
     }
 
     protected override void FixedUpdate()
     {
         player.MyCurrentStamina -= Time.deltaTime * player.staminaReduceSpeed;
-        
+
         player.Climb();
 
-        if (Input.GetKey(KeyCode.LeftShift))
-        {
-            stateMachine.ChangeState(PlayerStateMachine.StateEnum.Dash);
-        }
+        // if (Input.GetKey(KeyCode.LeftShift))
+        // {
+        //     stateMachine.ChangeState(PlayerStateMachine.StateEnum.Dash);
+        // }
 
         if (!Input.GetMouseButton(0) || player.staminaDepleted)
-            {
-                stateMachine.ChangeState(PlayerStateMachine.StateEnum.Normal);
-            }
-
+        {
+            stateMachine.ChangeState(PlayerStateMachine.StateEnum.Normal);
+        }
     }
 
     public override void OnExit()
     {
-        //player.StopCliffMove();
+        if (cliffCoroutine != null)
+        {
+            StopCoroutine(cliffCoroutine);
+
+        }
         if (rb == null)
         {
             rb = GetComponent<Rigidbody>();
