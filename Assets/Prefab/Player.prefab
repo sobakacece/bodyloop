@@ -123,9 +123,12 @@ MonoBehaviour:
   climbingSpeed: 2
   maxStamina: 100
   staminaDepleted: 0
+  isCliffCoroutineRunning: 0
   staminaReduceSpeed: 10
   staminaRecoverySpeed: 10
-  handMaxDistance: 2
+  handMaxDistance: 0.4
+  handDistanceOffset: 1.2
+  magnetSpeed: 8
   spawnPoint: {x: 0, y: 0, z: 0}
   spawnRotation: {x: 0, y: 0, z: 0, w: 0}
   handsLocalSpawnPosition: {x: 0, y: 0, z: 0}
@@ -134,6 +137,8 @@ MonoBehaviour:
     type: 3}
   staminaProgress: {fileID: 0}
   lastMovementDirection: {x: 0, y: 0, z: 0}
+  currentSwingTime: 0
+  defaultSwingTime: 0.1
   inZone: 0
   hintText: {fileID: 0}
 --- !u!54 &8886252700133780572

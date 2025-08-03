@@ -2,8 +2,10 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Animations;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using UnityEngine.XR;
 
 public class PlayerController : MonoBehaviour
 {
@@ -57,7 +59,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] public float staminaReduceSpeed = 10.0f;
     [SerializeField] public float staminaRecoverySpeed = 20.0f;
 
-    [SerializeField] public float handMaxDistance = 1.0f;
+    [SerializeField] public float handMaxDistance = 0.7f;
+    [SerializeField] public float handDistanceOffset = 0.3f;
     [SerializeField] public float magnetSpeed = 2.0f;
 
 
@@ -73,7 +76,6 @@ public class PlayerController : MonoBehaviour
 
     public Vector3 lastMovementDirection;
     private Vector3 lastPreviousPosition;
-
     public bool inZone;
     [SerializeField]
     private Text hintText;
@@ -85,8 +87,6 @@ public class PlayerController : MonoBehaviour
 
         handsLocalSpawnPosition = hands.transform.localPosition;
         handsLocalSpawnRotation = hands.transform.localRotation;
-
-
 
     }
     private void Start()
@@ -160,17 +160,6 @@ public class PlayerController : MonoBehaviour
         hintText.text = hint;
     }
 
-    public void SetCurrentSpeed(float newValue)
-    {
-        speed = newValue;
-        HandleSpeedChange(newValue);
-    }
-
-    private void HandleSpeedChange(float newValue)
-    {
-        float multiplier = (CurrentSpeed / baseSpeed);
-        viewCamera.fieldOfView = playerCameraFOV * multiplier;
-    }
     private void Restart()
     {
         GameFlow.Instance.GameRestart();
@@ -235,62 +224,51 @@ public class PlayerController : MonoBehaviour
     }
 
 
-    public void Climb(float forceModifier = 1, ForceMode forceMode = ForceMode.VelocityChange)
+    public void Climb()
     {
         rb.velocity = Vector3.zero;
 
         Vector2 input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
-        if (input == Vector2.zero) return;
+        bool inputHeld = input != Vector2.zero;
 
-        Vector3 delta = (headCamera.forward * input.y + headCamera.right * input.x).normalized * climbingSpeed * Time.deltaTime;
-
-        Debug.Log(headCamera.forward);
-
+        Vector3 inputDir = (headCamera.forward * input.y + headCamera.right * input.x).normalized;
+        float maxDistance = inputHeld ? handMaxDistance + handDistanceOffset : handMaxDistance;
 
         Vector3 toHands = hands.transform.position - transform.position;
 
 
-        if (toHands.magnitude > handMaxDistance)
+        if (inputHeld)
         {
-            Vector3 clampedPosition = hands.transform.position - toHands.normalized * handMaxDistance;
-            rb.position = clampedPosition;
+
+            Vector3 delta = transform.position + inputDir * climbingSpeed * Time.deltaTime; ;
+            Vector3 offsetFromHand = delta - hands.transform.position;
+
+            if (offsetFromHand.magnitude > maxDistance)
+            {
+                Vector3 tangentMove = Vector3.ProjectOnPlane(inputDir * climbingSpeed * Time.deltaTime, toHands.normalized);
+                Vector3 spherePosition = transform.position + tangentMove;
+
+                Vector3 correctedPosition = hands.transform.position + (spherePosition - hands.transform.position).normalized * maxDistance;
+                rb.MovePosition(correctedPosition);
+            }
+            else
+            {
+                rb.MovePosition(delta);
+            }
+
+            //If player doesn't move add small movement along the sphere
         }
         else
         {
-
-            rb.MovePosition(transform.position + delta);
-        }
-    }
-
-
-
-    Vector3 UpdateHandsPosition()
-    {
-        Vector3 origin = headCamera.position + headCamera.forward * 0.5f;
-        Vector3 direction = headCamera.forward;
-
-        const float rayDistance = 2f;
-        const float lerpSpeed = 10f;
-
-        if (Physics.Raycast(origin, direction, out RaycastHit hit, rayDistance, climbCollisions))
-        {
-            Vector3 targetPosition = hit.point + hit.normal * -0.01f;
-
-            Vector3 offsetFromBody = targetPosition - transform.position;
-            if (offsetFromBody.sqrMagnitude > grabDistance * grabDistance)
+            float overshoot = toHands.magnitude - maxDistance;
+            if (overshoot > 0)
             {
-                offsetFromBody = offsetFromBody.normalized * grabDistance;
-                targetPosition = transform.position + offsetFromBody;
+                Vector3 correction = toHands.normalized * Mathf.Min(overshoot, climbingSpeed * Time.deltaTime * 1.5f);
+                rb.MovePosition(transform.position + correction);
             }
-
-            hands.transform.position = Vector3.Lerp(hands.transform.position, targetPosition, Time.deltaTime * lerpSpeed);
-
-            hands.transform.rotation = Quaternion.LookRotation(-hit.normal);
-            return hit.normal;
         }
-
-        return Vector3.zero;
     }
+
 
     public RaycastHit HandsRay()
     {
@@ -301,11 +279,6 @@ public class PlayerController : MonoBehaviour
 
         Physics.Raycast(origin, direction, out RaycastHit hit, rayDistance, climbCollisions);
         return hit;
-    }
-
-    public void ClimbLedge()
-    {
-        // Debug.Log("Ledge");
     }
 
     public void ResetHandsPosition()
@@ -322,7 +295,7 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    public IEnumerator MoveToCliff(Vector3 targetPoint)
+    public IEnumerator MoveHandsToCliff(Vector3 targetPoint)
     {
         rb.velocity = Vector3.zero;
         //Quaternion previousRotation = transform.rotation;

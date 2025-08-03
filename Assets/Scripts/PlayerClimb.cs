@@ -27,7 +27,7 @@ public class PlayerClimb : PlayerState
         }
         Debug.Log("start");
         RaycastHit hit = player.HandsRay();
-        cliffCoroutine = StartCoroutine(player.MoveToCliff(hit.point));
+        cliffCoroutine = StartCoroutine(player.MoveHandsToCliff(hit.point));
 
     }
 
