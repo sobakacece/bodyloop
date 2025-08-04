@@ -27,6 +27,9 @@ public class PlayerStateMachine : MonoBehaviour
 
     public PlayerController player;
 
+    public event Action<StateEnum> StateEnterEvent;
+    public event Action<StateEnum> StateExitEvent;
+
     void Start()
     {
         foreach (PlayerScriptRelation relation in actions)
@@ -47,8 +50,12 @@ public class PlayerStateMachine : MonoBehaviour
         {
             FindAction(currentState).OnExit();
             FindAction(currentState).enabled = false;
+            StateExitEvent?.Invoke(currentState);
+
             FindAction(nextState).OnEnter();
             FindAction(nextState).enabled = true;
+            StateEnterEvent?.Invoke(nextState);
+            
             currentState = nextState;
         }
     }

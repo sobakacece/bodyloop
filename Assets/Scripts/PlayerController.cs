@@ -1,5 +1,7 @@
 using System;
 using System.Collections;
+using Unity.VisualScripting;
+using UnityEditor.UI;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Rendering;
@@ -9,7 +11,6 @@ using UnityEngine.XR;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private float playerCameraFOV = 60;
     [SerializeField] private float baseSpeed;
     [SerializeField] private float rotationSpeedY, rotationSpeedX;
     [SerializeField] private float jumpHeight;
@@ -24,10 +25,10 @@ public class PlayerController : MonoBehaviour
     public PlayerStateMachine stateMachine;
 
     [SerializeField] public LayerMask climbCollisions;
-    [SerializeField] public GameObject hands;
+    [SerializeField] public ClimbingHand leftHand;
+    [SerializeField] public ClimbingHand rightHand;
 
 
-    private Camera viewCamera;
     private float speed;
     public float mouseScale = 1.0f;
     public float BaseSpeed => baseSpeed;
@@ -85,9 +86,6 @@ public class PlayerController : MonoBehaviour
         spawnPoint = transform.position;
         spawnRotation = transform.rotation;
 
-        handsLocalSpawnPosition = hands.transform.localPosition;
-        handsLocalSpawnRotation = hands.transform.localRotation;
-
     }
     private void Start()
     {
@@ -100,8 +98,8 @@ public class PlayerController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         MyCurrentStamina = maxStamina;
         speed = baseSpeed;
-        viewCamera = headCamera.GetComponent<Camera>();
         stateMachine = GetComponent<PlayerStateMachine>();
+
         GameFlow.Instance.sensetivityChanged += (float value) =>
         {
             mouseScale = value;
@@ -118,7 +116,7 @@ public class PlayerController : MonoBehaviour
 
     public bool CouldStartClimb()
     {
-        return Physics.Raycast(headCamera.position, headCamera.forward, grabDistance, climbCollisions);
+        return ForwardRay().collider != null;
     }
 
     private void Update()
@@ -203,17 +201,9 @@ public class PlayerController : MonoBehaviour
 
         Quaternion q = Quaternion.Euler(mouseY, 0, 0) * headCamera.localRotation;
         Quaternion handsQ = Quaternion.Euler(mouseY, 0, 0) * headCamera.localRotation;
-        //cameraAngle = Vector3.Angle(cameraHolder.forward, q.eulerAngles);
 
         if (Mathf.Abs(q.x) <= 0.7)
             headCamera.localRotation = q;
-        if (stateMachine.currentState != PlayerStateMachine.StateEnum.Climb)
-        {
-
-            hands.transform.rotation = handsQ;
-            Vector3 handsOffset = headCamera.TransformPoint(new Vector3(handsLocalSpawnPosition.x, -handsLocalSpawnPosition.y, handsLocalSpawnPosition.z));
-            hands.transform.position = handsOffset;
-        }
     }
 
     private void Jump(float height)
@@ -226,6 +216,11 @@ public class PlayerController : MonoBehaviour
 
     public void Climb()
     {
+        //TODO
+        // Add second hand
+        // Add curves to acceleration/deacceleration
+        // Add random movement at high points
+        // Add fall state
         rb.velocity = Vector3.zero;
 
         Vector2 input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
@@ -234,21 +229,21 @@ public class PlayerController : MonoBehaviour
         Vector3 inputDir = (headCamera.forward * input.y + headCamera.right * input.x).normalized;
         float maxDistance = inputHeld ? handMaxDistance + handDistanceOffset : handMaxDistance;
 
-        Vector3 toHands = hands.transform.position - transform.position;
+        Vector3 toHands = leftHand.transform.position - transform.position;
 
 
         if (inputHeld)
         {
 
             Vector3 delta = transform.position + inputDir * climbingSpeed * Time.deltaTime; ;
-            Vector3 offsetFromHand = delta - hands.transform.position;
+            Vector3 offsetFromHand = delta - leftHand.transform.position;
 
             if (offsetFromHand.magnitude > maxDistance)
             {
                 Vector3 tangentMove = Vector3.ProjectOnPlane(inputDir * climbingSpeed * Time.deltaTime, toHands.normalized);
                 Vector3 spherePosition = transform.position + tangentMove;
 
-                Vector3 correctedPosition = hands.transform.position + (spherePosition - hands.transform.position).normalized * maxDistance;
+                Vector3 correctedPosition = leftHand.transform.position + (spherePosition - leftHand.transform.position).normalized * maxDistance;
                 rb.MovePosition(correctedPosition);
             }
             else
@@ -270,21 +265,14 @@ public class PlayerController : MonoBehaviour
     }
 
 
-    public RaycastHit HandsRay()
+    public RaycastHit ForwardRay()
     {
         Vector3 origin = headCamera.position + headCamera.forward * 0.5f;
         Vector3 direction = headCamera.forward;
 
-        const float rayDistance = 2f;
 
-        Physics.Raycast(origin, direction, out RaycastHit hit, rayDistance, climbCollisions);
+        Physics.Raycast(origin, direction, out RaycastHit hit, grabDistance, climbCollisions);
         return hit;
-    }
-
-    public void ResetHandsPosition()
-    {
-        hands.transform.localPosition = handsLocalSpawnPosition;
-        hands.transform.localRotation = handsLocalSpawnRotation;
     }
 
     public void Respawn()
@@ -295,30 +283,6 @@ public class PlayerController : MonoBehaviour
 
     }
 
-    public IEnumerator MoveHandsToCliff(Vector3 targetPoint)
-    {
-        rb.velocity = Vector3.zero;
-        //Quaternion previousRotation = transform.rotation;
-        while (true)
-        {
-            Vector3 direction = (targetPoint - hands.transform.position).normalized;
-            float distanceToTarget = Vector3.Distance(hands.transform.position, targetPoint);
-            float step = magnetSpeed * Time.deltaTime;
 
-            isCliffCoroutineRunning = true;
-            if (distanceToTarget <= 0.2f)
-                break;
-
-            if (Physics.Raycast(hands.transform.position, direction, step + 0.1f, Physics.AllLayers))
-                break;
-
-            hands.transform.position += direction * Mathf.Min(step, distanceToTarget);
-            // transform.rotation = Quaternion.Slerp(previousRotation, targetRotation, Time.deltaTime * 5f);
-            // previousRotation = transform.rotation;
-            yield return null;
-        }
-        isCliffCoroutineRunning = false;
-        //transform.rotation = targetRotation;
-    }
 
 }

@@ -17,17 +17,8 @@ public class PlayerClimb : PlayerState
     {
         rb = GetComponent<Rigidbody>();
         rb.useGravity = false;
+        rb.velocity = Vector3.zero;
         // player.hands.GetComponent<RotationConstraint>().enabled = true;
-        player.hands.transform.SetParent(null, true);
-
-        player.hands.GetComponent<MeshRenderer>().enabled = true;
-        if (cliffCoroutine != null)
-        {
-            StopCoroutine(cliffCoroutine);
-        }
-        Debug.Log("start");
-        RaycastHit hit = player.HandsRay();
-        cliffCoroutine = StartCoroutine(player.MoveHandsToCliff(hit.point));
 
     }
 
@@ -50,29 +41,23 @@ public class PlayerClimb : PlayerState
 
     public override void OnExit()
     {
-        if (cliffCoroutine != null)
-        {
-            StopCoroutine(cliffCoroutine);
-
-        }
+ 
         if (rb == null)
         {
             rb = GetComponent<Rigidbody>();
         }
         rb.useGravity = true;
-        player.hands.transform.SetParent(player.cameraHolder, true);
-        player.ResetHandsPosition();
-        player.hands.GetComponent<MeshRenderer>().enabled = false;
+        
     }
 
-    bool CheckLedge()
-    {
-        Physics.Raycast(player.hands.transform.position, player.hands.transform.forward, out RaycastHit hit, player.grabDistance, player.climbCollisions);
+    // bool CheckLedge()
+    // {
+    //     Physics.Raycast(player.leftHand.transform.position, player.leftHand.transform.forward, out RaycastHit hit, player.grabDistance, player.climbCollisions);
 
-        Vector3 ledgeCheckOrigin = hit.point + Vector3.up * ledgeOffset;
-        return Physics.Raycast(ledgeCheckOrigin, Vector3.down, ledgeCheckDistance);
+    //     Vector3 ledgeCheckOrigin = hit.point + Vector3.up * ledgeOffset;
+    //     return Physics.Raycast(ledgeCheckOrigin, Vector3.down, ledgeCheckDistance);
 
-    }
+    // }
 
 
 
