@@ -12,7 +12,7 @@ public class PlayerState : MonoBehaviour
     public PlayerController player;
 [NonSerialized]
 
-    public PlayerStateMachine stateMachine;
+    public StateMachine stateMachine;
 
     void Start()
     {

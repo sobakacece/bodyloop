@@ -33,9 +33,9 @@ public class PlayerClimb : PlayerState
         //     stateMachine.ChangeState(PlayerStateMachine.StateEnum.Dash);
         // }
 
-        if (!Input.GetMouseButton(0) || player.staminaDepleted)
+        if ((!Input.GetMouseButton(0) && !Input.GetMouseButton(1))  || player.staminaDepleted)
         {
-            stateMachine.ChangeState(PlayerStateMachine.StateEnum.Normal);
+            stateMachine.ChangeState(StateMachine.StateEnum.Normal);
         }
     }
 

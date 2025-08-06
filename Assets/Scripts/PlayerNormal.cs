@@ -21,9 +21,9 @@ public class PlayerNormal : PlayerState
             player.Move();
         }
 
-        if (player.CouldStartClimb() && Input.GetMouseButton(0) && !player.staminaDepleted)
+        if (player.CouldStartClimb() && (Input.GetMouseButton(0) || Input.GetMouseButton(1)) && !player.staminaDepleted)
         {
-            stateMachine.ChangeState(PlayerStateMachine.StateEnum.Climb);
+            stateMachine.ChangeState(StateMachine.StateEnum.Climb);
         }
 
     }

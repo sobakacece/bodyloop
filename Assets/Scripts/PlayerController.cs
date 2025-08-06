@@ -12,7 +12,7 @@ using UnityEngine.XR;
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private float baseSpeed;
-    [SerializeField] private float rotationSpeedY, rotationSpeedX;
+    [SerializeField] private float rotationSpeedY;
     [SerializeField] private float jumpHeight;
     [SerializeField] public float grabDistance = 2.0f;
 
@@ -22,11 +22,10 @@ public class PlayerController : MonoBehaviour
     //   [SerializeField] private SimpleGroundChecker groundChecker;
     [SerializeField] private Collider mainCollider;
 
-    public PlayerStateMachine stateMachine;
+    public StateMachine stateMachine;
 
     [SerializeField] public LayerMask climbCollisions;
-    [SerializeField] public ClimbingHand leftHand;
-    [SerializeField] public ClimbingHand rightHand;
+    [SerializeField] public ClimbingHand[] hands;
 
 
     private float speed;
@@ -77,6 +76,8 @@ public class PlayerController : MonoBehaviour
 
     public Vector3 lastMovementDirection;
     private Vector3 lastPreviousPosition;
+
+    private Vector3 lastMagnetPosition = Vector3.zero;
     public bool inZone;
     [SerializeField]
     private Text hintText;
@@ -98,7 +99,7 @@ public class PlayerController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         MyCurrentStamina = maxStamina;
         speed = baseSpeed;
-        stateMachine = GetComponent<PlayerStateMachine>();
+        stateMachine = GetComponent<StateMachine>();
 
         GameFlow.Instance.sensetivityChanged += (float value) =>
         {
@@ -208,7 +209,7 @@ public class PlayerController : MonoBehaviour
 
     private void Jump(float height)
     {
-        stateMachine.ChangeState(PlayerStateMachine.StateEnum.Normal);
+        stateMachine.ChangeState(StateMachine.StateEnum.Normal);
         rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
         rb.AddForce(Vector3.up * height, ForceMode.Impulse);
     }
@@ -227,23 +228,30 @@ public class PlayerController : MonoBehaviour
         bool inputHeld = input != Vector2.zero;
 
         Vector3 inputDir = (headCamera.forward * input.y + headCamera.right * input.x).normalized;
+
         float maxDistance = inputHeld ? handMaxDistance + handDistanceOffset : handMaxDistance;
 
-        Vector3 toHands = leftHand.transform.position - transform.position;
+        Vector3 magnetPoint = FindMagnetPoint();
+
+        lastMagnetPosition = magnetPoint;
+
+//        Debug.Log(magnetPoint);
+
+        Vector3 toHands = magnetPoint - transform.position;
 
 
         if (inputHeld)
         {
 
             Vector3 delta = transform.position + inputDir * climbingSpeed * Time.deltaTime; ;
-            Vector3 offsetFromHand = delta - leftHand.transform.position;
+            Vector3 offsetFromHand = delta - magnetPoint;
 
             if (offsetFromHand.magnitude > maxDistance)
             {
                 Vector3 tangentMove = Vector3.ProjectOnPlane(inputDir * climbingSpeed * Time.deltaTime, toHands.normalized);
                 Vector3 spherePosition = transform.position + tangentMove;
 
-                Vector3 correctedPosition = leftHand.transform.position + (spherePosition - leftHand.transform.position).normalized * maxDistance;
+                Vector3 correctedPosition = magnetPoint + (spherePosition - magnetPoint).normalized * maxDistance;
                 rb.MovePosition(correctedPosition);
             }
             else
@@ -264,14 +272,30 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    private Vector3 FindMagnetPoint()
+    {
+        if (hands[0].isActive && hands[1].isActive)
+        {
+            return (hands[0].transform.position + hands[1].transform.position) / 2f;
+        }
+        else if (hands[0].isActive)
+        {
+            return hands[0].transform.position;
+        }
+        else if (hands[1].isActive)
+        {
+            return hands[1].transform.position;
+        }
+        return lastMagnetPosition;
+    }
+
 
     public RaycastHit ForwardRay()
     {
-        Vector3 origin = headCamera.position + headCamera.forward * 0.5f;
-        Vector3 direction = headCamera.forward;
+        Vector3 origin = headCamera.position + headCamera.forward;
 
-
-        Physics.Raycast(origin, direction, out RaycastHit hit, grabDistance, climbCollisions);
+        Physics.Raycast(origin, headCamera.forward, out RaycastHit hit, grabDistance, climbCollisions);
+        Debug.DrawRay(origin, headCamera.forward, Color.red);
         return hit;
     }
 
@@ -282,7 +306,5 @@ public class PlayerController : MonoBehaviour
         currentStamina = maxStamina;
 
     }
-
-
 
 }

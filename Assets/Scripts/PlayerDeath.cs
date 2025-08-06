@@ -33,7 +33,7 @@ public class PlayerDeath : PlayerState
     }
     protected override void FixedUpdate()
     {
-        stateMachine.ChangeState(PlayerStateMachine.StateEnum.Normal);
+        stateMachine.ChangeState(StateMachine.StateEnum.Normal);
     }
 
     public override void OnExit()

@@ -1,19 +1,20 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.XR;
 
 public class ClimbingHand : MonoBehaviour
 {
     public Transform startTransform;
     public LayerMask climbableMask;
-    private bool isActive = true;
+    public bool isActive = true;
     [SerializeField] int buttonIndex = 0;
 
     [SerializeField]
     private PlayerController player;
     Coroutine cliffCoroutine;
 
-    bool isCliffCoroutineRunning;
 
     void Awake()
     {
@@ -27,15 +28,26 @@ public class ClimbingHand : MonoBehaviour
         player.stateMachine.StateExitEvent += StopClimb;
     }
 
-    void FixedUpdate()
+    void Update()
     {
-        isActive = Input.GetMouseButton(buttonIndex);
+
+        if (Input.GetMouseButtonDown(buttonIndex) && player.CouldStartClimb())
+        {
+            HandActive();
+            Debug.Log("Hand active");
+        }
+
+        if (Input.GetMouseButtonUp(buttonIndex))
+        {
+            HandRest();
+        }
+
     }
 
     public void ResetHandPosition()
     {
-        gameObject.transform.position = startTransform.position;
-        gameObject.transform.rotation = startTransform.rotation;
+        transform.position = startTransform.position;
+        transform.rotation = startTransform.rotation;
     }
 
     void OnDestroy()
@@ -44,37 +56,47 @@ public class ClimbingHand : MonoBehaviour
         player.stateMachine.StateExitEvent -= StopClimb;
     }
 
-    void StartClimb(PlayerStateMachine.StateEnum state)
+    void StartClimb(StateMachine.StateEnum state)
     {
-        if (state == PlayerStateMachine.StateEnum.Climb)
+        if (state == StateMachine.StateEnum.Climb && Input.GetMouseButtonDown(buttonIndex))
         {
-            transform.SetParent(null, true);
-
-            GetComponent<MeshRenderer>().enabled = true;
-            if (cliffCoroutine != null)
-            {
-                StopCoroutine(cliffCoroutine);
-            }
-            RaycastHit hit = player.ForwardRay();
-            cliffCoroutine = StartCoroutine(MoveHandsToCliff(hit.point));
-
+            HandActive();
         }
     }
 
-    void StopClimb(PlayerStateMachine.StateEnum state)
+    void StopClimb(StateMachine.StateEnum state)
     {
-        if (state == PlayerStateMachine.StateEnum.Climb)
+        if (state == StateMachine.StateEnum.Climb)
         {
-            player.leftHand.transform.SetParent(player.cameraHolder, true);
-            player.leftHand.ResetHandPosition();
-            player.leftHand.GetComponent<MeshRenderer>().enabled = false;
-
-            if (cliffCoroutine != null)
-            {
-                StopCoroutine(cliffCoroutine);
-            }
+            HandRest();
         }
 
+    }
+
+    void HandActive()
+    {
+        transform.SetParent(null, true);
+        isActive = true;
+        GetComponent<MeshRenderer>().enabled = true;
+        if (cliffCoroutine != null)
+        {
+            StopCoroutine(cliffCoroutine);
+        }
+        RaycastHit hit = player.ForwardRay();
+        Debug.Log("Target point " + hit.point);
+        cliffCoroutine = StartCoroutine(MoveHandsToCliff(hit.point));
+    }
+
+    void HandRest()
+    {
+        ResetHandPosition();
+        transform.SetParent(player.cameraHolder, true);
+        GetComponent<MeshRenderer>().enabled = false;
+        isActive = false;
+        if (cliffCoroutine != null)
+        {
+            StopCoroutine(cliffCoroutine);
+        }
     }
 
     public IEnumerator MoveHandsToCliff(Vector3 targetPoint)
@@ -87,11 +109,7 @@ public class ClimbingHand : MonoBehaviour
             float distanceToTarget = Vector3.Distance(transform.position, targetPoint);
             float step = player.magnetSpeed * Time.deltaTime;
 
-            isCliffCoroutineRunning = true;
-            if (distanceToTarget <= 0.2f)
-                break;
-
-            if (Physics.Raycast(transform.position, direction, step + 0.1f, Physics.AllLayers))
+            if (distanceToTarget <= 0.05f)
                 break;
 
             transform.position += direction * Mathf.Min(step, distanceToTarget);
@@ -99,7 +117,6 @@ public class ClimbingHand : MonoBehaviour
             // previousRotation = transform.rotation;
             yield return null;
         }
-        isCliffCoroutineRunning = false;
         //transform.rotation = targetRotation;
     }
 

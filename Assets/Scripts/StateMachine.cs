@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerStateMachine : MonoBehaviour
+public class StateMachine : MonoBehaviour
 {
 
     public enum StateEnum
@@ -55,7 +55,7 @@ public class PlayerStateMachine : MonoBehaviour
             FindAction(nextState).OnEnter();
             FindAction(nextState).enabled = true;
             StateEnterEvent?.Invoke(nextState);
-            
+
             currentState = nextState;
         }
     }

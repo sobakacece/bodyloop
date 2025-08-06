@@ -17,11 +17,11 @@ public class Spike : MonoBehaviour
 
     void OnCollisionEnter(Collision col)
     {
-        PlayerStateMachine stateMachine = col.collider.GetComponent<PlayerStateMachine>();
+        StateMachine stateMachine = col.collider.GetComponent<StateMachine>();
         Debug.Log(col.gameObject.name);
         if (stateMachine != null)
         {
-            stateMachine.ChangeState(PlayerStateMachine.StateEnum.Death);
+            stateMachine.ChangeState(StateMachine.StateEnum.Death);
             coll = col;
             StartCoroutine(AttachRagdoll());
         }

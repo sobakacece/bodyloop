@@ -104,10 +104,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41334002b68425e4cafadef30e2a9b03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerCameraFOV: 60
   baseSpeed: 8
   rotationSpeedY: 450
-  rotationSpeedX: 450
   jumpHeight: 5
   grabDistance: 3
   headCamera: {fileID: 3648555962382487933}
@@ -119,9 +117,13 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 8
   leftHand: {fileID: 2893079681565986516}
+  rightHand: {fileID: 745915697929652365}
+  hands:
+  - {fileID: 2893079681565986516}
+  - {fileID: 745915697929652365}
   mouseScale: 0.3
   climbingSpeed: 2
-  maxStamina: 100
+  maxStamina: 1000
   staminaDepleted: 0
   isCliffCoroutineRunning: 0
   staminaReduceSpeed: 10
@@ -276,6 +278,7 @@ GameObject:
   - component: {fileID: 5813903138901289332}
   - component: {fileID: 9164430424865503309}
   - component: {fileID: 2555156045413521201}
+  - component: {fileID: 745915697929652365}
   m_Layer: 0
   m_Name: RightHand
   m_TagString: Untagged
@@ -348,6 +351,25 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4325534217246146325}
   m_Mesh: {fileID: 10207, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &745915697929652365
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4325534217246146325}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1f137ec3b7dc9c04d9032ebef8a799d2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startTransform: {fileID: 0}
+  climbableMask:
+    serializedVersion: 2
+    m_Bits: 0
+  isActive: 1
+  buttonIndex: 1
+  player: {fileID: 0}
 --- !u!1 &5374442801556485777
 GameObject:
   m_ObjectHideFlags: 0
@@ -389,7 +411,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5374442801556485777}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -444,13 +466,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1f137ec3b7dc9c04d9032ebef8a799d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  handL: {fileID: 0}
-  handR: {fileID: 0}
-  regripDistance: 0.4
-  reachSpeed: 10
+  startTransform: {fileID: 0}
   climbableMask:
     serializedVersion: 2
     m_Bits: 0
+  isActive: 1
+  buttonIndex: 0
   player: {fileID: 0}
 --- !u!1 &5648672224902614892
 GameObject:

@@ -14,8 +14,7 @@ public class PlayerDash : PlayerState
     public override void OnEnter()
     {
         rb = player.GetComponent<Rigidbody>();
-        Physics.Raycast(player.leftHand.transform.position, player.leftHand.transform.forward, out RaycastHit hit, 2.0f, player.climbCollisions);
-        rb.AddForce(Vector3.ProjectOnPlane(player.lastMovementDirection, hit.normal) * dashImpulse, ForceMode.Impulse);
+        rb.AddForce(Vector3.ProjectOnPlane(player.lastMovementDirection, player.ForwardRay().normal) * dashImpulse, ForceMode.Impulse);
         rb.useGravity = false;
         player.MyCurrentStamina -= staminaUsage;
         StartCoroutine(ReturnToNormal());
@@ -34,7 +33,7 @@ public class PlayerDash : PlayerState
     private IEnumerator ReturnToNormal()
     {
         yield return new WaitForSeconds(0.3f);
-        stateMachine.ChangeState(PlayerStateMachine.StateEnum.Normal);
+        stateMachine.ChangeState(StateMachine.StateEnum.Normal);
     }
 
 }
