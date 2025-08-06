@@ -217,11 +217,6 @@ public class PlayerController : MonoBehaviour
 
     public void Climb()
     {
-        //TODO
-        // Add second hand
-        // Add curves to acceleration/deacceleration
-        // Add random movement at high points
-        // Add fall state
         rb.velocity = Vector3.zero;
 
         Vector2 input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
