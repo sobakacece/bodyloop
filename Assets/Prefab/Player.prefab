@@ -107,7 +107,7 @@ MonoBehaviour:
   baseSpeed: 8
   rotationSpeedY: 450
   jumpHeight: 5
-  grabDistance: 2
+  grabDistance: 2.5
   headCamera: {fileID: 3648555962382487933}
   cameraHolder: {fileID: 2387856492467596027}
   rb: {fileID: 8886252700133780572}
@@ -115,7 +115,7 @@ MonoBehaviour:
   stateMachine: {fileID: 5534996273890607898}
   climbCollisions:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 520
   hands:
   - {fileID: 2893079681565986516}
   - {fileID: 745915697929652365}
@@ -135,11 +135,10 @@ MonoBehaviour:
   handsLocalSpawnRotation: {x: 0, y: 0, z: 0, w: 0}
   hudPrefab: {fileID: 2586764456638285324, guid: 688de4aab92fe3749833a19416bf1046,
     type: 3}
-  staminaProgress: {fileID: 0}
+  playerHUD: {fileID: 0}
   lastMovementDirection: {x: 0, y: 0, z: 0}
   lastMagnetPosition: {x: 0, y: 0, z: 0}
   inZone: 0
-  hintText: {fileID: 0}
 --- !u!54 &8886252700133780572
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -365,7 +364,7 @@ MonoBehaviour:
   startTransform: {fileID: 0}
   climbableMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 520
   magnetSpeed: 7
   isActive: 1
   buttonIndex: 1
@@ -469,7 +468,7 @@ MonoBehaviour:
   startTransform: {fileID: 0}
   climbableMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 520
   magnetSpeed: 7
   isActive: 1
   buttonIndex: 0

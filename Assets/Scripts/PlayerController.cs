@@ -43,7 +43,7 @@ public class PlayerController : MonoBehaviour
             {
                 staminaDepleted = false;
             }
-            staminaProgress.ImageProgress = currentStamina / maxStamina;
+            playerHUD.ImageProgress = currentStamina / maxStamina;
         }
     }
     private float currentStamina;
@@ -64,7 +64,7 @@ public class PlayerController : MonoBehaviour
     public Quaternion handsLocalSpawnRotation;
 
     [SerializeField] private GameObject hudPrefab;
-    [SerializeField] private RadialMenu staminaProgress;
+    [SerializeField] private PlayerHUD playerHUD;
 
 
     public Vector3 lastMovementDirection;
@@ -73,7 +73,6 @@ public class PlayerController : MonoBehaviour
     public Vector3 lastMagnetPosition = Vector3.zero;
     public bool inZone;
     [SerializeField]
-    private Text hintText;
 
     void Awake()
     {
@@ -85,7 +84,7 @@ public class PlayerController : MonoBehaviour
     {
         GameObject hudInstance = Instantiate(hudPrefab);
         //.transform.SetParent(hands.transform);
-        staminaProgress = hudInstance.GetComponent<RadialMenu>();
+        playerHUD = hudInstance.GetComponent<PlayerHUD>();
 
 
         Cursor.visible = false;
@@ -145,11 +144,12 @@ public class PlayerController : MonoBehaviour
         }
 
         lastPreviousPosition = currentPosition;
+        playerHUD.UpdateCrossHair(CouldStartClimb());
     }
 
     public void UpdateHintText(string hint)
     {
-        hintText.text = hint;
+        playerHUD.hintText.text = hint;
     }
 
     private void Restart()
@@ -221,7 +221,6 @@ public class PlayerController : MonoBehaviour
         Vector3 magnetPoint = FindMagnetPoint();
         if (magnetPoint == Vector3.zero)
             return;
-
         // prevent to snap to the 0 coordinate
         // climb state resets lastmagnetposition to Vector3.zero, so it updated on the first frame of climbing instead of lerping from zero
         if (lastMagnetPosition == Vector3.zero)
@@ -231,7 +230,7 @@ public class PlayerController : MonoBehaviour
             float handJump = Vector3.Distance(lastMagnetPosition, magnetPoint);
 
             // If hands change position drastically, smooth more aggressively
-            if (handJump > maxDistance * 0.5f) // threshold can be tuned
+            if (handJump > maxDistance * 0.5f)
                 lastMagnetPosition = Vector3.Lerp(lastMagnetPosition, magnetPoint, Time.deltaTime * (1.0f * 0.5f));
             else
                 lastMagnetPosition = Vector3.Lerp(lastMagnetPosition, magnetPoint, 1.0f * Time.deltaTime);
@@ -297,10 +296,10 @@ public class PlayerController : MonoBehaviour
 
     public RaycastHit ForwardRay()
     {
-        Vector3 origin = headCamera.position + headCamera.forward;
+        Vector3 origin = headCamera.position;
 
         Physics.Raycast(origin, headCamera.forward, out RaycastHit hit, grabDistance, climbCollisions);
-        Debug.DrawRay(origin, headCamera.forward, Color.red);
+        Debug.DrawRay(origin, headCamera.forward.normalized * grabDistance, Color.red);
         return hit;
     }
 

@@ -1,13 +1,23 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class RadialMenu : MonoBehaviour
+public class PlayerHUD : MonoBehaviour
 {
 
     public Image loadingImage;
+    [SerializeField]
+    private Image crossHair;
     [Range(0, 1)]
     private float progress = 0;
     private Color currentColor;
+
+    [SerializeField]
+    private Texture2D point;
+    [SerializeField]
+    private Texture2D cross;
+
+    [SerializeField]
+    public Text hintText;
 
     public float ImageProgress
     {
@@ -46,6 +56,12 @@ public class RadialMenu : MonoBehaviour
     void Start()
     {
         currentColor = loadingImage.color;
+    }
+
+    public void UpdateCrossHair(bool couldClimb)
+    {
+        Texture2D texture = couldClimb ? cross : point;
+        crossHair.sprite = Sprite.Create(texture, new Rect(0,0, texture.width, texture.height), new Vector2(0.5f, 0.5f));
     }
 
 }

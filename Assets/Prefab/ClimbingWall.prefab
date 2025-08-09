@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7956328169419444736}
   - component: {fileID: 3330052364616913326}
   - component: {fileID: 5679823624955165878}
-  m_Layer: 0
+  m_Layer: 2
   m_Name: ClimbingWall
   m_TagString: Untagged
   m_Icon: {fileID: 0}
