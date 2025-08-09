@@ -1,13 +1,6 @@
 using System;
-using System.Collections;
-using Unity.VisualScripting;
-using UnityEditor.UI;
 using UnityEngine;
-using UnityEngine.Animations;
-using UnityEngine.Rendering;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using UnityEngine.XR;
 
 public class PlayerController : MonoBehaviour
 {
@@ -61,7 +54,7 @@ public class PlayerController : MonoBehaviour
 
     [SerializeField] public float handMaxDistance = 0.7f;
     [SerializeField] public float handDistanceOffset = 0.3f;
-    [SerializeField] public float magnetSpeed = 2.0f;
+    [SerializeField] public float lerpCorrectionSpeed = 8.0f;
 
 
     public Vector3 spawnPoint;
@@ -77,7 +70,7 @@ public class PlayerController : MonoBehaviour
     public Vector3 lastMovementDirection;
     private Vector3 lastPreviousPosition;
 
-    private Vector3 lastMagnetPosition = Vector3.zero;
+    public Vector3 lastMagnetPosition = Vector3.zero;
     public bool inZone;
     [SerializeField]
     private Text hintText;
@@ -221,40 +214,50 @@ public class PlayerController : MonoBehaviour
 
         Vector2 input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
         bool inputHeld = input != Vector2.zero;
-
         Vector3 inputDir = (headCamera.forward * input.y + headCamera.right * input.x).normalized;
 
-        float maxDistance = inputHeld ? handMaxDistance + handDistanceOffset : handMaxDistance;
+        float maxDistance = handMaxDistance + (inputHeld ? handDistanceOffset : 0f);
 
         Vector3 magnetPoint = FindMagnetPoint();
+        if (magnetPoint == Vector3.zero)
+            return;
 
-        lastMagnetPosition = magnetPoint;
+        // prevent to snap to the 0 coordinate
+        // climb state resets lastmagnetposition to Vector3.zero, so it updated on the first frame of climbing instead of lerping from zero
+        if (lastMagnetPosition == Vector3.zero)
+            lastMagnetPosition = magnetPoint;
+        else
+        {
+            float handJump = Vector3.Distance(lastMagnetPosition, magnetPoint);
 
-//        Debug.Log(magnetPoint);
+            // If hands change position drastically, smooth more aggressively
+            if (handJump > maxDistance * 0.5f) // threshold can be tuned
+                lastMagnetPosition = Vector3.Lerp(lastMagnetPosition, magnetPoint, Time.deltaTime * (1.0f * 0.5f));
+            else
+                lastMagnetPosition = Vector3.Lerp(lastMagnetPosition, magnetPoint, 1.0f * Time.deltaTime);
+        }
 
         Vector3 toHands = magnetPoint - transform.position;
 
-
         if (inputHeld)
         {
+            Vector3 delta = transform.position + inputDir * climbingSpeed * Time.deltaTime;
+            Vector3 target = delta;
 
-            Vector3 delta = transform.position + inputDir * climbingSpeed * Time.deltaTime; ;
-            Vector3 offsetFromHand = delta - magnetPoint;
-
-            if (offsetFromHand.magnitude > maxDistance)
+            // if you are in range of hand -> move as intended with camera turned on
+            if ((delta - magnetPoint).magnitude > maxDistance)
             {
                 Vector3 tangentMove = Vector3.ProjectOnPlane(inputDir * climbingSpeed * Time.deltaTime, toHands.normalized);
                 Vector3 spherePosition = transform.position + tangentMove;
 
-                Vector3 correctedPosition = magnetPoint + (spherePosition - magnetPoint).normalized * maxDistance;
-                rb.MovePosition(correctedPosition);
-            }
-            else
-            {
-                rb.MovePosition(delta);
+                target = magnetPoint + (spherePosition - magnetPoint).normalized * maxDistance;
+
+                // basicaly if you move too far from the hand -> you begin to move along the invisible sphere around the magnet point
             }
 
-            //If player doesn't move add small movement along the sphere
+            rb.MovePosition(Vector3.Lerp(transform.position, target, lerpCorrectionSpeed * Time.deltaTime));
+
+            // If player doesn't move add small movement along the sphere
         }
         else
         {
@@ -262,26 +265,33 @@ public class PlayerController : MonoBehaviour
             if (overshoot > 0)
             {
                 Vector3 correction = toHands.normalized * Mathf.Min(overshoot, climbingSpeed * Time.deltaTime * 1.5f);
-                rb.MovePosition(transform.position + correction);
+                Vector3 target = transform.position + correction;
+                rb.MovePosition(Vector3.Lerp(transform.position, target, lerpCorrectionSpeed * Time.deltaTime));
             }
+
+            // if you don't hold input -> magnet to your hand
         }
     }
 
+
     private Vector3 FindMagnetPoint()
     {
+        //looking for magnet point for climb function. Basically either of hands or middle point between them. Vector.zero is a null point. Feels dull, but anyway
+        Vector3 target = Vector3.zero;
+
         if (hands[0].isActive && hands[1].isActive)
         {
-            return (hands[0].transform.position + hands[1].transform.position) / 2f;
+            target = (hands[0].transform.position + hands[1].transform.position) / 2f;
         }
         else if (hands[0].isActive)
         {
-            return hands[0].transform.position;
+            target = hands[0].transform.position;
         }
         else if (hands[1].isActive)
         {
-            return hands[1].transform.position;
+            target = hands[1].transform.position;
         }
-        return lastMagnetPosition;
+        return target;
     }
 
 

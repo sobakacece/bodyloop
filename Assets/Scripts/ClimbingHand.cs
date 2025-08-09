@@ -8,6 +8,8 @@ public class ClimbingHand : MonoBehaviour
 {
     public Transform startTransform;
     public LayerMask climbableMask;
+    [SerializeField] public float magnetSpeed = 7.0f;
+
     public bool isActive = true;
     [SerializeField] int buttonIndex = 0;
 
@@ -89,10 +91,10 @@ public class ClimbingHand : MonoBehaviour
 
     void HandRest()
     {
+        isActive = false;
         ResetHandPosition();
         transform.SetParent(player.cameraHolder, true);
         GetComponent<MeshRenderer>().enabled = false;
-        isActive = false;
         if (cliffCoroutine != null)
         {
             StopCoroutine(cliffCoroutine);
@@ -107,7 +109,7 @@ public class ClimbingHand : MonoBehaviour
         {
             Vector3 direction = (targetPoint - transform.position).normalized;
             float distanceToTarget = Vector3.Distance(transform.position, targetPoint);
-            float step = player.magnetSpeed * Time.deltaTime;
+            float step = magnetSpeed * Time.deltaTime;
 
             if (distanceToTarget <= 0.05f)
                 break;

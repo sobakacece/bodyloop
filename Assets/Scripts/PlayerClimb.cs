@@ -41,12 +41,13 @@ public class PlayerClimb : PlayerState
 
     public override void OnExit()
     {
- 
+
         if (rb == null)
         {
             rb = GetComponent<Rigidbody>();
         }
         rb.useGravity = true;
+        player.lastMagnetPosition = Vector3.zero;
         
     }
 

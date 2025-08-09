@@ -107,7 +107,7 @@ MonoBehaviour:
   baseSpeed: 8
   rotationSpeedY: 450
   jumpHeight: 5
-  grabDistance: 3
+  grabDistance: 2
   headCamera: {fileID: 3648555962382487933}
   cameraHolder: {fileID: 2387856492467596027}
   rb: {fileID: 8886252700133780572}
@@ -116,21 +116,19 @@ MonoBehaviour:
   climbCollisions:
     serializedVersion: 2
     m_Bits: 8
-  leftHand: {fileID: 2893079681565986516}
-  rightHand: {fileID: 745915697929652365}
   hands:
   - {fileID: 2893079681565986516}
   - {fileID: 745915697929652365}
   mouseScale: 0.3
-  climbingSpeed: 2
+  climbingSpeed: 1
   maxStamina: 1000
   staminaDepleted: 0
   isCliffCoroutineRunning: 0
   staminaReduceSpeed: 10
   staminaRecoverySpeed: 10
   handMaxDistance: 0.4
-  handDistanceOffset: 1.2
-  magnetSpeed: 8
+  handDistanceOffset: 0.8
+  lerpCorrectionSpeed: 100
   spawnPoint: {x: 0, y: 0, z: 0}
   spawnRotation: {x: 0, y: 0, z: 0, w: 0}
   handsLocalSpawnPosition: {x: 0, y: 0, z: 0}
@@ -139,6 +137,7 @@ MonoBehaviour:
     type: 3}
   staminaProgress: {fileID: 0}
   lastMovementDirection: {x: 0, y: 0, z: 0}
+  lastMagnetPosition: {x: 0, y: 0, z: 0}
   inZone: 0
   hintText: {fileID: 0}
 --- !u!54 &8886252700133780572
@@ -367,6 +366,7 @@ MonoBehaviour:
   climbableMask:
     serializedVersion: 2
     m_Bits: 0
+  magnetSpeed: 7
   isActive: 1
   buttonIndex: 1
   player: {fileID: 0}
@@ -470,6 +470,7 @@ MonoBehaviour:
   climbableMask:
     serializedVersion: 2
     m_Bits: 0
+  magnetSpeed: 7
   isActive: 1
   buttonIndex: 0
   player: {fileID: 0}
