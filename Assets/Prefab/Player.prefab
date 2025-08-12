@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 5053170558713040730}
   - component: {fileID: 2370691340498140086}
   - component: {fileID: 5074994759184820283}
+  - component: {fileID: 8547929306241413652}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -106,7 +107,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   baseSpeed: 8
   rotationSpeedY: 450
-  jumpHeight: 5
+  jumpHeight: 11
   grabDistance: 2.5
   headCamera: {fileID: 3648555962382487933}
   cameraHolder: {fileID: 2387856492467596027}
@@ -187,6 +188,8 @@ MonoBehaviour:
     action: {fileID: 2108549959242884040}
   - state: 3
     action: {fileID: 2370691340498140086}
+  - state: 4
+    action: {fileID: 8547929306241413652}
   currentState: 0
   player: {fileID: 6041707669237050055}
 --- !u!114 &6500549939601347387
@@ -229,6 +232,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b3ebc939dc9592b488e755b5c68a5ae3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  movingSpeed: 7
 --- !u!114 &2370691340498140086
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -265,6 +269,20 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 2, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &8547929306241413652
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 857907827663657364}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b4bc6f822dd634548998761214b135ef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  climbDelayTimer: 0.15
+  fallMovingSpeed: 7
 --- !u!1 &4325534217246146325
 GameObject:
   m_ObjectHideFlags: 0
