@@ -109,10 +109,11 @@ public class PlayerController : MonoBehaviour
         return ForwardRay().collider != null;
     }
 
+
     private void Update()
     {
         //        Debug.Log(hands.transform.forward);
-
+      //  PreventCornerSnag();
 
         if (Input.GetKeyDown(KeyCode.R))
             Restart();
@@ -124,6 +125,11 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.P))
         {
             GameFlow.Instance.CallPauseMenu();
+        }
+
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            stateMachine.ChangeState(StateMachine.StateEnum.Death);
         }
 
         Vector3 currentPosition = transform.position;
@@ -206,7 +212,7 @@ public class PlayerController : MonoBehaviour
 
     public void Climb()
     {
-    //    rb.velocity = Vector3.zero;
+        //    rb.velocity = Vector3.zero;
 
         Vector2 input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
         bool inputHeld = input != Vector2.zero;

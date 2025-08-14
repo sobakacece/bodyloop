@@ -18,8 +18,8 @@ GameObject:
   - component: {fileID: 2108549959242884040}
   - component: {fileID: 5053170558713040730}
   - component: {fileID: 2370691340498140086}
-  - component: {fileID: 5074994759184820283}
   - component: {fileID: 8547929306241413652}
+  - component: {fileID: 5761916023356100522}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -105,14 +105,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41334002b68425e4cafadef30e2a9b03, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  baseSpeed: 8
-  rotationSpeedY: 450
+  rotationSpeedY: 400
   jumpHeight: 11
   grabDistance: 2.5
   headCamera: {fileID: 3648555962382487933}
   cameraHolder: {fileID: 2387856492467596027}
   rb: {fileID: 8886252700133780572}
-  mainCollider: {fileID: 5074994759184820283}
+  mainCollider: {fileID: 5761916023356100522}
   stateMachine: {fileID: 5534996273890607898}
   climbCollisions:
     serializedVersion: 2
@@ -121,8 +120,8 @@ MonoBehaviour:
   - {fileID: 2893079681565986516}
   - {fileID: 745915697929652365}
   mouseScale: 0.3
-  climbingSpeed: 1
-  maxStamina: 1000
+  climbingSpeed: 2
+  maxStamina: 100
   staminaDepleted: 0
   isCliffCoroutineRunning: 0
   staminaReduceSpeed: 10
@@ -166,7 +165,7 @@ Rigidbody:
   m_IsKinematic: 0
   m_Interpolate: 0
   m_Constraints: 112
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!114 &5534996273890607898
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -233,6 +232,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   movingSpeed: 7
+  coyotteTime: 0.25
 --- !u!114 &2370691340498140086
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -248,27 +248,6 @@ MonoBehaviour:
   dashImpulse: 5
   dashTime: 0.2
   staminaUsage: 15
---- !u!65 &5074994759184820283
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 857907827663657364}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 2, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &8547929306241413652
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -283,6 +262,29 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   climbDelayTimer: 0.15
   fallMovingSpeed: 7
+--- !u!136 &5761916023356100522
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 857907827663657364}
+  m_Material: {fileID: 13400000, guid: 30b3c21243749f24cae0fdfa5a1f67c4, type: 2}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 2
+  m_Radius: 0.5
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1 &4325534217246146325
 GameObject:
   m_ObjectHideFlags: 0
