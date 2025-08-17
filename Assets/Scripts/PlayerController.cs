@@ -1,17 +1,17 @@
 using System;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.UI;
 
 public class PlayerController : MonoBehaviour
 {
-    [SerializeField] private float baseSpeed;
     [SerializeField] private float rotationSpeedY;
-    [SerializeField] private float jumpHeight;
+    [SerializeField] public float jumpHeight;
     [SerializeField] public float grabDistance = 2.0f;
 
     [SerializeField] public Transform headCamera;
     [SerializeField] public Transform cameraHolder;
-    [SerializeField] private Rigidbody rb;
+    [SerializeField] public Rigidbody rb;
     //   [SerializeField] private SimpleGroundChecker groundChecker;
     [SerializeField] private Collider mainCollider;
 
@@ -21,10 +21,7 @@ public class PlayerController : MonoBehaviour
     [SerializeField] public ClimbingHand[] hands;
 
 
-    private float speed;
     public float mouseScale = 1.0f;
-    public float BaseSpeed => baseSpeed;
-    public float CurrentSpeed => speed;
 
     [SerializeField] private float climbingSpeed = 10.0f;
     [SerializeField] public float maxStamina = 100.0f;
@@ -90,7 +87,6 @@ public class PlayerController : MonoBehaviour
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
         MyCurrentStamina = maxStamina;
-        speed = baseSpeed;
         stateMachine = GetComponent<StateMachine>();
 
         GameFlow.Instance.sensetivityChanged += (float value) =>
@@ -104,7 +100,8 @@ public class PlayerController : MonoBehaviour
 
     public bool IsGrounded()
     {
-        return Physics.Raycast(transform.position, -Vector3.up, mainCollider.bounds.size.y);
+        Debug.DrawRay(transform.position, -Vector3.up * mainCollider.bounds.size.y / 2, Color.red);
+        return Physics.Raycast(transform.position, -Vector3.up, mainCollider.bounds.size.y / 2);
     }
 
     public bool CouldStartClimb()
@@ -112,11 +109,11 @@ public class PlayerController : MonoBehaviour
         return ForwardRay().collider != null;
     }
 
+
     private void Update()
     {
         //        Debug.Log(hands.transform.forward);
-        if (Input.GetKeyDown(KeyCode.Space) && IsGrounded())
-            Jump(jumpHeight);
+      //  PreventCornerSnag();
 
         if (Input.GetKeyDown(KeyCode.R))
             Restart();
@@ -128,6 +125,11 @@ public class PlayerController : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.P))
         {
             GameFlow.Instance.CallPauseMenu();
+        }
+
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            stateMachine.ChangeState(StateMachine.StateEnum.Death);
         }
 
         Vector3 currentPosition = transform.position;
@@ -157,7 +159,7 @@ public class PlayerController : MonoBehaviour
         GameFlow.Instance.GameRestart();
     }
 
-    public void Move()
+    public void Move(float speed = 1)
     {
         Vector2 input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
         if (input == Vector2.zero) return;
@@ -200,17 +202,17 @@ public class PlayerController : MonoBehaviour
             headCamera.localRotation = q;
     }
 
-    private void Jump(float height)
+    public void Jump(float height)
     {
-        stateMachine.ChangeState(StateMachine.StateEnum.Normal);
-        rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
+        //stateMachine.ChangeState(StateMachine.StateEnum.Fall);
+        //rb.velocity = new Vector3(rb.velocity.x, 0, rb.velocity.z);
         rb.AddForce(Vector3.up * height, ForceMode.Impulse);
     }
 
 
     public void Climb()
     {
-        rb.velocity = Vector3.zero;
+        //    rb.velocity = Vector3.zero;
 
         Vector2 input = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
         bool inputHeld = input != Vector2.zero;

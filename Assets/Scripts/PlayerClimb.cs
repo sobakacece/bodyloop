@@ -22,20 +22,40 @@ public class PlayerClimb : PlayerState
 
     }
 
+    public void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            player.Jump(player.jumpHeight);
+            stateMachine.ChangeState(StateMachine.StateEnum.Fall);
+        }
+    }
+
     protected override void FixedUpdate()
     {
         player.MyCurrentStamina -= Time.deltaTime * player.staminaReduceSpeed;
 
         player.Climb();
 
+
+
         // if (Input.GetKey(KeyCode.LeftShift))
         // {
         //     stateMachine.ChangeState(PlayerStateMachine.StateEnum.Dash);
         // }
 
-        if ((!Input.GetMouseButton(0) && !Input.GetMouseButton(1))  || player.staminaDepleted)
+        if ((!Input.GetMouseButton(0) && !Input.GetMouseButton(1)) || player.staminaDepleted)
         {
-            stateMachine.ChangeState(StateMachine.StateEnum.Normal);
+            if (player.IsGrounded())
+            {
+                stateMachine.ChangeState(StateMachine.StateEnum.Normal);
+
+            }
+            else
+            {
+
+                stateMachine.ChangeState(StateMachine.StateEnum.Fall);
+            }
         }
     }
 
@@ -48,7 +68,7 @@ public class PlayerClimb : PlayerState
         }
         rb.useGravity = true;
         player.lastMagnetPosition = Vector3.zero;
-        
+
     }
 
     // bool CheckLedge()

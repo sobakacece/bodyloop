@@ -36,7 +36,7 @@ public class ClimbingHand : MonoBehaviour
         if (Input.GetMouseButtonDown(buttonIndex) && player.CouldStartClimb())
         {
             HandActive();
-            Debug.Log("Hand active");
+//            Debug.Log("Hand active");
         }
 
         if (Input.GetMouseButtonUp(buttonIndex))

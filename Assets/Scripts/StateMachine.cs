@@ -1,6 +1,5 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class StateMachine : MonoBehaviour
@@ -11,7 +10,8 @@ public class StateMachine : MonoBehaviour
         Normal,
         Climb,
         Death,
-        Dash
+        Dash,
+        Fall
 
     }
 
@@ -80,6 +80,15 @@ public class StateMachine : MonoBehaviour
             FindAction(currentState).enabled = true;
         }
     }
+
+    private void OnGUI()
+    {
+        GUIStyle style = new GUIStyle();
+        style.fontSize = 24;
+        style.normal.textColor = Color.white;
+        GUI.Label(new Rect(40, 40, 400, 80), currentState.ToString(), style);
+    }
+
 }
 
 
