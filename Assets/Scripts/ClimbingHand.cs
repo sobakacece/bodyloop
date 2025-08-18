@@ -17,6 +17,8 @@ public class ClimbingHand : MonoBehaviour
     private PlayerController player;
     Coroutine cliffCoroutine;
 
+    private bool wasReseted;
+
 
     void Awake()
     {
@@ -32,16 +34,28 @@ public class ClimbingHand : MonoBehaviour
 
     void Update()
     {
+        if (Input.GetMouseButtonUp(buttonIndex))
+        {
+            wasReseted = true;
+        }
+
+        if (Input.GetMouseButton(buttonIndex) && player.CouldStartClimb() && player.stateMachine.currentState == StateMachine.StateEnum.Fall && wasReseted)
+        {
+            HandActive();
+            return;
+        }
 
         if (Input.GetMouseButtonDown(buttonIndex) && player.CouldStartClimb())
         {
             HandActive();
-//            Debug.Log("Hand active");
+            return;
         }
+
 
         if (Input.GetMouseButtonUp(buttonIndex))
         {
             HandRest();
+            return;
         }
 
     }
@@ -77,6 +91,7 @@ public class ClimbingHand : MonoBehaviour
 
     void HandActive()
     {
+        wasReseted = false;
         transform.SetParent(null, true);
         isActive = true;
         GetComponent<MeshRenderer>().enabled = true;
@@ -84,9 +99,8 @@ public class ClimbingHand : MonoBehaviour
         {
             StopCoroutine(cliffCoroutine);
         }
-        RaycastHit hit = player.ForwardRay();
-        Debug.Log("Target point " + hit.point);
-        cliffCoroutine = StartCoroutine(MoveHandsToCliff(hit.point));
+        // Debug.Log("Target point " + hit.point);
+        cliffCoroutine = StartCoroutine(MoveHandsToCliff(player.ForwardRay().point));
     }
 
     void HandRest()
@@ -103,7 +117,7 @@ public class ClimbingHand : MonoBehaviour
 
     public IEnumerator MoveHandsToCliff(Vector3 targetPoint)
     {
-
+        Debug.Log("Moved to Cliff");
         //Quaternion previousRotation = transform.rotation;
         while (true)
         {
@@ -111,7 +125,7 @@ public class ClimbingHand : MonoBehaviour
             float distanceToTarget = Vector3.Distance(transform.position, targetPoint);
             float step = magnetSpeed * Time.deltaTime;
 
-            if (distanceToTarget <= 0.05f)
+            if (distanceToTarget <= 0.01f)
                 break;
 
             transform.position += direction * Mathf.Min(step, distanceToTarget);

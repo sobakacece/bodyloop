@@ -27,7 +27,7 @@ public class PlayerNormal : PlayerState
             player.Move(movingSpeed);
         }
 
-        if (player.CouldStartClimb() && (Input.GetMouseButton(0) || Input.GetMouseButton(1)) && !player.staminaDepleted)
+        if (player.CouldStartClimb() && (player.hands[0].isActive || player.hands[1].isActive) && !player.staminaDepleted)
         {
             stateMachine.ChangeState(StateMachine.StateEnum.Climb);
         }

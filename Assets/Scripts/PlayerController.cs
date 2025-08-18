@@ -100,9 +100,14 @@ public class PlayerController : MonoBehaviour
 
     public bool IsGrounded()
     {
-        Debug.DrawRay(transform.position, -Vector3.up * mainCollider.bounds.size.y / 2, Color.red);
-        return Physics.Raycast(transform.position, -Vector3.up, mainCollider.bounds.size.y / 2);
+        float radius = mainCollider.bounds.extents.x - 0.2f; // approximate cylinder radius
+        float checkDistance = 0.1f; // small extra distance to check just below the collider
+        Vector3 origin = transform.position + Vector3.up * 0.1f; // lift origin slightly to avoid clipping
+
+        return Physics.SphereCast(origin, radius, Vector3.down, out _,
+            mainCollider.bounds.extents.y + checkDistance);
     }
+
 
     public bool CouldStartClimb()
     {
@@ -113,7 +118,8 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         //        Debug.Log(hands.transform.forward);
-      //  PreventCornerSnag();
+        //  PreventCornerSnag();
+        Debug.Log(IsGrounded());
 
         if (Input.GetKeyDown(KeyCode.R))
             Restart();
@@ -256,7 +262,7 @@ public class PlayerController : MonoBehaviour
                 // basicaly if you move too far from the hand -> you begin to move along the invisible sphere around the magnet point
             }
 
-            rb.MovePosition(Vector3.Lerp(transform.position, target, lerpCorrectionSpeed * Time.deltaTime));
+            rb.MovePosition(Vector3.Lerp(transform.position, target, lerpCorrectionSpeed));
 
             // If player doesn't move add small movement along the sphere
         }
@@ -267,7 +273,7 @@ public class PlayerController : MonoBehaviour
             {
                 Vector3 correction = toHands.normalized * Mathf.Min(overshoot, climbingSpeed * Time.deltaTime * 1.5f);
                 Vector3 target = transform.position + correction;
-                rb.MovePosition(Vector3.Lerp(transform.position, target, lerpCorrectionSpeed * Time.deltaTime));
+                rb.MovePosition(Vector3.Lerp(transform.position, target, lerpCorrectionSpeed));
             }
 
             // if you don't hold input -> magnet to your hand
@@ -307,10 +313,12 @@ public class PlayerController : MonoBehaviour
 
     public void Respawn()
     {
+        rb.velocity = Vector3.zero;
         transform.position = spawnPoint;
         transform.rotation = spawnRotation;
         currentStamina = maxStamina;
 
     }
+    
 
 }
