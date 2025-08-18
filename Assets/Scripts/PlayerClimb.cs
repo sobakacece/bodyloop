@@ -44,8 +44,9 @@ public class PlayerClimb : PlayerState
         //     stateMachine.ChangeState(PlayerStateMachine.StateEnum.Dash);
         // }
 
-        if ((!Input.GetMouseButton(0) && !Input.GetMouseButton(1)) || player.staminaDepleted)
+        if ((!player.hands[0].isActive && !player.hands[1].isActive) || player.staminaDepleted)
         {
+            Debug.Log("Exiting Climb");
             if (player.IsGrounded())
             {
                 stateMachine.ChangeState(StateMachine.StateEnum.Normal);
@@ -53,7 +54,6 @@ public class PlayerClimb : PlayerState
             }
             else
             {
-
                 stateMachine.ChangeState(StateMachine.StateEnum.Fall);
             }
         }

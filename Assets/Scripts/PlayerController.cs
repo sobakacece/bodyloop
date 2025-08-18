@@ -119,7 +119,6 @@ public class PlayerController : MonoBehaviour
     {
         //        Debug.Log(hands.transform.forward);
         //  PreventCornerSnag();
-        Debug.Log(IsGrounded());
 
         if (Input.GetKeyDown(KeyCode.R))
             Restart();
@@ -319,6 +318,16 @@ public class PlayerController : MonoBehaviour
         currentStamina = maxStamina;
 
     }
-    
+
+    private void OnGUI()
+    {
+        GUIStyle style = new GUIStyle();
+        style.fontSize = 24;
+        style.normal.textColor = Color.white;
+        GUI.Label(new Rect(40, 120, 400, 80), "left hand activity: " + hands[0].isActive, style);
+        GUI.Label(new Rect(40, 200, 400, 80), "right hand activity: " + hands[1].isActive, style);
+    }
+
+
 
 }

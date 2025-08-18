@@ -390,7 +390,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 520
   magnetSpeed: 7
-  isActive: 1
+  isActive: 0
   buttonIndex: 1
   player: {fileID: 0}
 --- !u!1 &5374442801556485777
@@ -434,7 +434,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5374442801556485777}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -494,7 +494,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 520
   magnetSpeed: 7
-  isActive: 1
+  isActive: 0
   buttonIndex: 0
   player: {fileID: 0}
 --- !u!1 &5648672224902614892

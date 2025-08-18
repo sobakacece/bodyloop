@@ -17,7 +17,7 @@ public class ClimbingHand : MonoBehaviour
     private PlayerController player;
     Coroutine cliffCoroutine;
 
-    private bool wasReseted;
+    private bool wasReseted = true;
 
 
     void Awake()
@@ -34,12 +34,7 @@ public class ClimbingHand : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetMouseButtonUp(buttonIndex))
-        {
-            wasReseted = true;
-        }
-
-        if (Input.GetMouseButton(buttonIndex) && player.CouldStartClimb() && player.stateMachine.currentState == StateMachine.StateEnum.Fall && wasReseted)
+        if (Input.GetMouseButton(buttonIndex) && player.CouldStartClimb() && player.stateMachine.currentState == StateMachine.StateEnum.Fall && !isActive)
         {
             HandActive();
             return;
@@ -91,7 +86,6 @@ public class ClimbingHand : MonoBehaviour
 
     void HandActive()
     {
-        wasReseted = false;
         transform.SetParent(null, true);
         isActive = true;
         GetComponent<MeshRenderer>().enabled = true;
@@ -117,7 +111,6 @@ public class ClimbingHand : MonoBehaviour
 
     public IEnumerator MoveHandsToCliff(Vector3 targetPoint)
     {
-        Debug.Log("Moved to Cliff");
         //Quaternion previousRotation = transform.rotation;
         while (true)
         {
