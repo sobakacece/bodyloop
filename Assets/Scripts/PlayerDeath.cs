@@ -6,11 +6,13 @@ using UnityEngine.Playables;
 public class PlayerDeath : PlayerState
 {
     // Start is called before the first frame update
-    public GameObject playerPrefab;
-
+    public GameObject gluePrefab;
+    public GameObject usualPrefab;
+    public Vector3 ragdollSpawnPoint = Vector3.zero;
+    public bool shouldGlue = false;
     public override void OnEnter()
     {
-        Debug.Log(player.spawnPoint);
+        //        Debug.Log(player.spawnPoint);
         // player.enabled = false;
         // player.headCamera.GetComponent<AudioListener>().enabled = false;
         // player.headCamera.GetComponent<Camera>().enabled = false;
@@ -21,6 +23,12 @@ public class PlayerDeath : PlayerState
         //rb.constraints = RigidbodyConstraints.FreezeAll;
 
         //GameObject newPlayerObject = Instantiate(playerPrefab, transform.position, transform.rotation);
+        if (ragdollSpawnPoint == Vector3.zero)
+        {
+            ragdollSpawnPoint = player.transform.position;
+            shouldGlue = false;
+        }
+        SpawnRagdoll();
         player.Respawn();
         // PlayerController newPlayer = newPlayerObject.GetComponent<PlayerController>();
         // newPlayer.enabled = true;
@@ -38,6 +46,16 @@ public class PlayerDeath : PlayerState
 
     public override void OnExit()
     {
+        shouldGlue = false;
+        ragdollSpawnPoint = Vector3.zero;
     }
+
+    public void SpawnRagdoll()
+    {
+        GameObject playerPrefab = shouldGlue ? gluePrefab : usualPrefab;
+        Instantiate(playerPrefab, ragdollSpawnPoint, transform.rotation);
+    }
+
+
 
 }

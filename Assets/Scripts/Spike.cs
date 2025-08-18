@@ -1,13 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
 
 public class Spike : MonoBehaviour
 {
     public GameObject playerPrefab;
-    private Collision coll;
 
     public LayerMask layerMask;
     // Start is called before the first frame update
@@ -18,12 +18,11 @@ public class Spike : MonoBehaviour
     void OnCollisionEnter(Collision col)
     {
         StateMachine stateMachine = col.collider.GetComponent<StateMachine>();
-        Debug.Log(col.gameObject.name);
-        if (stateMachine != null)
+        //        Debug.Log(col.gameObject.name);
+        if (stateMachine != null && col.contacts.Length > 0)
         {
-            stateMachine.ChangeState(StateMachine.StateEnum.Death);
-            coll = col;
-            StartCoroutine(AttachRagdoll());
+            ContactPoint contact = col.GetContact(0);
+            StartCoroutine(AttachRagdoll(contact, stateMachine));
         }
 
         // On collision we simply create a glue object at any contact point.
@@ -35,22 +34,17 @@ public class Spike : MonoBehaviour
 
     }
 
-    private IEnumerator AttachRagdoll()
+    private IEnumerator AttachRagdoll(ContactPoint col, StateMachine stateMachine)
     {
+
         yield return new WaitForEndOfFrame();
-        
-        Instantiate(playerPrefab, coll.contacts[0].point, GetSurfaceAlignedRotation(coll.contacts[0].normal, -coll.contacts[0].normal));
+        PlayerDeath state = stateMachine.GetComponent<PlayerDeath>();
+        state.ragdollSpawnPoint = col.point;
+        state.shouldGlue = true;
+        stateMachine.ChangeState(StateMachine.StateEnum.Death);
+
 
     }
-
-    Quaternion GetSurfaceAlignedRotation(Vector3 surfaceNormal, Vector3 preferredForward)
-    {
-        if (Vector3.Dot(surfaceNormal.normalized, preferredForward.normalized) > 0.99f)
-            preferredForward = Vector3.Cross(surfaceNormal, Vector3.right);
-
-        return Quaternion.LookRotation(Vector3.ProjectOnPlane(preferredForward, surfaceNormal).normalized, surfaceNormal);
-    }
-
 
     // Vector3 FindEmptySpawnPoint(Vector3 origin, Vector3 surfaceNormal, Vector3 size, float radius, LayerMask checkMask)
     // {

@@ -120,15 +120,15 @@ MonoBehaviour:
   - {fileID: 2893079681565986516}
   - {fileID: 745915697929652365}
   mouseScale: 0.3
-  climbingSpeed: 2
+  climbingSpeed: 6
   maxStamina: 100
   staminaDepleted: 0
   isCliffCoroutineRunning: 0
-  staminaReduceSpeed: 10
+  staminaReduceSpeed: 5
   staminaRecoverySpeed: 10
-  handMaxDistance: 0.4
+  handMaxDistance: 0.8
   handDistanceOffset: 0.8
-  lerpCorrectionSpeed: 100
+  lerpCorrectionSpeed: 0.5
   spawnPoint: {x: 0, y: 0, z: 0}
   spawnRotation: {x: 0, y: 0, z: 0, w: 0}
   handsLocalSpawnPosition: {x: 0, y: 0, z: 0}
@@ -217,8 +217,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a5ffa4f5eaa12d42a6062d19185df34, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerPrefab: {fileID: 7257651725886686745, guid: a7cc7954d8f6d0041ab1977ffca582bd,
+  gluePrefab: {fileID: 8949668403311522494, guid: 8fc2d9d67f7f75f4394ef8ba1d7af7b1,
     type: 3}
+  usualPrefab: {fileID: 7257651725886686745, guid: a7cc7954d8f6d0041ab1977ffca582bd,
+    type: 3}
+  ragdollSpawnPoint: {x: 0, y: 0, z: 0}
+  shouldGlue: 0
 --- !u!114 &5053170558713040730
 MonoBehaviour:
   m_ObjectHideFlags: 0
