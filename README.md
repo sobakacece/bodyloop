@@ -7,3 +7,4 @@
         // Fix bug quick snapping while holding input and releasing hand - HIGH
 
         // concept corpse moving mechanics
+        //Fix double jump bug
